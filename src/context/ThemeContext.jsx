@@ -10,7 +10,8 @@ function getInitial() {
   } catch (e) {
     /* ignore */
   }
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  // Default to dark — this is a dark-first dashboard.
+  return 'dark'
 }
 
 export function ThemeProvider({ children }) {

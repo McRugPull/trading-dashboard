@@ -74,7 +74,7 @@ export default function Journal() {
       />
 
       {/* Tabs */}
-      <div className="mb-5 inline-flex rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-800 dark:bg-slate-900">
+      <div className="mb-5 inline-flex rounded-xl border border-slate-200 bg-white p-1 dark:border-neutral-800 dark:bg-neutral-900">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -82,7 +82,7 @@ export default function Journal() {
             className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition ${
               tab === t.id
                 ? 'bg-brand-600 text-white'
-                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-neutral-800'
             }`}
           >
             {t.label}

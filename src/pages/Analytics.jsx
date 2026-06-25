@@ -90,7 +90,7 @@ export default function Analytics() {
         title="Analytics"
         subtitle="See where your edge — and your leaks — really are."
         actions={
-          <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-800 dark:bg-slate-900">
+          <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1 dark:border-neutral-800 dark:bg-neutral-900">
             <button
               onClick={() => setTab('charts')}
               className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
@@ -297,7 +297,7 @@ function AiTab({ trades, stats, settings, updateSettings }) {
 
   return (
     <div className="space-y-5">
-      <Card className="border-brand-200 bg-gradient-to-br from-brand-50 to-white dark:border-brand-900/40 dark:from-brand-950/30 dark:to-slate-900">
+      <Card className="border-brand-200 bg-gradient-to-br from-brand-50 to-white dark:border-brand-500/20 dark:from-brand-950/30 dark:to-neutral-900">
         <div className="flex items-start gap-3">
           <span className="rounded-xl bg-brand-600 p-2 text-white">
             <SparkIcon className="h-5 w-5" />

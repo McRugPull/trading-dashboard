@@ -67,7 +67,7 @@ export function Meter({ value, max = 100, label, valueLabel, dangerHigh = true }
           <span className="font-medium tabular-nums text-slate-700 dark:text-slate-200">{valueLabel}</span>
         </div>
       )}
-      <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+      <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-neutral-800">
         <div className={`h-full rounded-full transition-all ${bar}`} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -76,9 +76,9 @@ export function Meter({ value, max = 100, label, valueLabel, dangerHigh = true }
 
 export function EmptyState({ icon: Icon, title, message, action }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 p-10 text-center dark:border-slate-700">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 p-10 text-center dark:border-neutral-700">
       {Icon && (
-        <span className="mb-3 rounded-2xl bg-slate-100 p-3 text-slate-400 dark:bg-slate-800 dark:text-slate-500">
+        <span className="mb-3 rounded-2xl bg-slate-100 p-3 text-slate-400 dark:bg-neutral-800 dark:text-slate-500">
           <Icon className="h-7 w-7" />
         </span>
       )}
@@ -108,11 +108,11 @@ export function Modal({ open, onClose, title, children, maxWidth = 'max-w-2xl' }
         className={`card my-6 w-full ${maxWidth} animate-[fadeIn_.12s_ease-out]`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-neutral-800">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-neutral-800 dark:hover:text-slate-200"
             aria-label="Close"
           >
             <XIcon className="h-5 w-5" />

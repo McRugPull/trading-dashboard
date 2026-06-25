@@ -199,7 +199,7 @@ export default function TradeForm({ initial, onSubmit, submitLabel = 'Log trade'
         </div>
         <div>
           <label className="label">Direction</label>
-          <div className="flex overflow-hidden rounded-lg border border-slate-300 dark:border-slate-700">
+          <div className="flex overflow-hidden rounded-lg border border-slate-300 dark:border-neutral-700">
             {['long', 'short'].map((d) => (
               <button
                 key={d}
@@ -210,7 +210,7 @@ export default function TradeForm({ initial, onSubmit, submitLabel = 'Log trade'
                     ? d === 'long'
                       ? 'bg-emerald-500 text-white'
                       : 'bg-rose-500 text-white'
-                    : 'bg-white text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                    : 'bg-white text-slate-600 dark:bg-neutral-800 dark:text-slate-300'
                 }`}
               >
                 {d}
@@ -328,7 +328,7 @@ export default function TradeForm({ initial, onSubmit, submitLabel = 'Log trade'
                 type="button"
                 onClick={() => toggleTag(tag)}
                 className={`chip ${
-                  active ? TAG_STYLES[tag] : 'border-slate-300 text-slate-500 dark:border-slate-700 dark:text-slate-400'
+                  active ? TAG_STYLES[tag] : 'border-slate-300 text-slate-500 dark:border-neutral-700 dark:text-slate-400'
                 }`}
               >
                 {tag}
@@ -339,7 +339,7 @@ export default function TradeForm({ initial, onSubmit, submitLabel = 'Log trade'
       </div>
 
       {/* Rules followed */}
-      <label className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+      <label className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 dark:border-neutral-800">
         <input
           type="checkbox"
           checked={form.rulesFollowed}
@@ -366,7 +366,7 @@ export default function TradeForm({ initial, onSubmit, submitLabel = 'Log trade'
           <label className="label">Chart screenshot</label>
           {form.screenshot ? (
             <div className="relative inline-block">
-              <img src={form.screenshot} alt="chart" className="h-20 rounded-lg border border-slate-200 dark:border-slate-700" />
+              <img src={form.screenshot} alt="chart" className="h-20 rounded-lg border border-slate-200 dark:border-neutral-700" />
               <button
                 type="button"
                 onClick={() => set({ screenshot: null })}

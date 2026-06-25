@@ -73,7 +73,7 @@ export default function Accounts() {
                   </div>
                   <button
                     onClick={() => openEdit(acc)}
-                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-neutral-800 dark:hover:text-slate-200"
                     aria-label="Edit"
                   >
                     <EditIcon className="h-4 w-4" />
@@ -81,13 +81,13 @@ export default function Accounts() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50">
+                  <div className="rounded-xl bg-slate-50 p-3 dark:bg-neutral-800/50">
                     <p className="text-xs text-slate-500 dark:text-slate-400">Balance</p>
                     <p className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">
                       {money0(s.currentBalance)}
                     </p>
                   </div>
-                  <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50">
+                  <div className="rounded-xl bg-slate-50 p-3 dark:bg-neutral-800/50">
                     <p className="text-xs text-slate-500 dark:text-slate-400">Net P&L</p>
                     <p className={`text-xl font-bold tabular-nums ${pnlColor(s.netPnl)}`}>{signedMoney(s.netPnl)}</p>
                   </div>
@@ -111,7 +111,7 @@ export default function Accounts() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800">
+                <div className="flex items-center justify-between border-t border-slate-100 pt-3 dark:border-neutral-800">
                   <span className="text-xs text-slate-400">High-water mark {money0(s.highWaterMark)}</span>
                   <ConfirmButton
                     className="btn-ghost px-3 py-1.5 text-xs"

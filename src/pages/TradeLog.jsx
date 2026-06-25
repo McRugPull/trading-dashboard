@@ -184,9 +184,9 @@ export default function TradeLog() {
       ) : (
         <>
           {/* Desktop table */}
-          <div className="hidden overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 md:block">
+          <div className="hidden overflow-hidden rounded-2xl border border-slate-200 dark:border-neutral-800 md:block">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500 dark:bg-slate-800/50 dark:text-slate-400">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500 dark:bg-neutral-800/50 dark:text-slate-400">
                 <tr>
                   <th className="px-4 py-3 font-medium">Date</th>
                   <th className="px-4 py-3 font-medium">Instrument</th>
@@ -199,9 +199,9 @@ export default function TradeLog() {
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
                 {filtered.map((t) => (
-                  <tr key={t.id} className="bg-white dark:bg-slate-900">
+                  <tr key={t.id} className="bg-white dark:bg-neutral-900">
                     <td className="whitespace-nowrap px-4 py-3 text-slate-500 dark:text-slate-400">
                       {formatDateTime(t.date)}
                       {accountName(t.accountId) && (
@@ -306,7 +306,7 @@ export default function TradeLog() {
                     ))}
                   </div>
                 )}
-                <div className="flex items-center justify-between border-t border-slate-100 pt-2 dark:border-slate-800">
+                <div className="flex items-center justify-between border-t border-slate-100 pt-2 dark:border-neutral-800">
                   <span className="text-xs text-slate-400">
                     {t.quality > 0 ? '★'.repeat(t.quality) : 'Unrated'} · {tradeBrokeRules(t) ? 'Rules broken' : 'Clean'}
                   </span>

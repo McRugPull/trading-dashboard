@@ -31,7 +31,7 @@ export default function Checklist() {
                 className={`flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition ${
                   checked
                     ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-700/60 dark:bg-emerald-900/20'
-                    : 'border-slate-200 bg-white hover:border-brand-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-brand-700'
+                    : 'border-slate-200 bg-white hover:border-brand-300 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-brand-700'
                 }`}
               >
                 <span

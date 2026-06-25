@@ -124,6 +124,20 @@ export const TargetIcon = base(
     <circle cx="12" cy="12" r="0.5" />
   </>
 )
+export const RefreshIcon = base(
+  <>
+    <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+    <path d="M21 3v5h-5" />
+    <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+    <path d="M3 21v-5h5" />
+  </>
+)
+export const QuoteIcon = base(
+  <>
+    <path d="M7 7H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V9c0-2.5-1-4-3.5-5" />
+    <path d="M19 7h-2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V9c0-2.5-1-4-3.5-5" />
+  </>
+)
 export const ImageIcon = base(
   <>
     <rect x="3" y="4" width="18" height="16" rx="2" />

@@ -66,7 +66,7 @@ export default function PasswordGate({ children }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 dark:bg-slate-950">
+    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 dark:bg-black">
       <div className="absolute right-4 top-4">
         <ThemeToggle />
       </div>

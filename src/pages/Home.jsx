@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useData } from '../context/DataContext'
-import { quoteForDay } from '../lib/quotes'
+import { quoteForDay, randomQuote } from '../lib/quotes'
 import { summaryStats } from '../lib/analytics'
 import { money, signedMoney, pnlColor, pct, money0 } from '../lib/format'
 import { formatLongDate, todayKey, dayOfYear } from '../lib/date'
@@ -13,6 +14,8 @@ import {
   BookIcon,
   ChartIcon,
   TargetIcon,
+  SparkIcon,
+  RefreshIcon,
 } from '../components/Icons'
 
 const JOURNAL_PROMPTS = [
@@ -28,7 +31,7 @@ const JOURNAL_PROMPTS = [
 export default function Home() {
   const { trades, accounts, accountStats, todayPnl, todays, streak, anyRulesBrokenToday, settings, getJournal } =
     useData()
-  const quote = quoteForDay()
+  const [quote, setQuote] = useState(() => quoteForDay())
   const stats = summaryStats(trades)
   const todayStats = summaryStats(todays)
   const prompt = JOURNAL_PROMPTS[dayOfYear() % JOURNAL_PROMPTS.length]
@@ -56,15 +59,36 @@ export default function Home() {
         </div>
       )}
 
-      {/* Quote of the day */}
-      <Card className="mb-6 border-brand-200 bg-gradient-to-br from-brand-50 to-white dark:border-brand-900/40 dark:from-brand-950/40 dark:to-slate-900">
-        <p className="text-xs font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-400">
-          Today&apos;s mindset
-        </p>
-        <blockquote className="mt-2 text-lg font-medium leading-relaxed text-slate-800 dark:text-slate-100">
-          “{quote.text}”
+      {/* Motivation card */}
+      <Card className="relative mb-6 overflow-hidden border-brand-500/20 dark:border-brand-500/20">
+        {/* soft brand glow + giant quote glyph */}
+        <div className="pointer-events-none absolute -left-12 -top-16 h-44 w-44 rounded-full bg-brand-500/10 blur-3xl" />
+        <div
+          className="pointer-events-none absolute -right-3 -top-10 select-none font-serif text-[9rem] leading-none text-brand-500/10 dark:text-brand-400/10"
+          aria-hidden="true"
+        >
+          ”
+        </div>
+
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2 text-brand-600 dark:text-brand-400">
+            <SparkIcon className="h-4 w-4" />
+            <span className="text-xs font-semibold uppercase tracking-wider">Today&apos;s mindset</span>
+          </div>
+          <button
+            onClick={() => setQuote((q) => randomQuote(q))}
+            title="Shuffle quote"
+            aria-label="Shuffle quote"
+            className="group rounded-lg border border-slate-200 p-1.5 text-slate-400 transition hover:border-brand-400 hover:text-brand-500 dark:border-neutral-700 dark:hover:border-brand-500"
+          >
+            <RefreshIcon className="h-4 w-4 transition-transform group-hover:rotate-180 group-active:rotate-180" />
+          </button>
+        </div>
+
+        <blockquote className="relative mt-3 text-xl font-medium leading-relaxed text-slate-800 dark:text-slate-50 sm:text-2xl">
+          {quote.text}
         </blockquote>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">— {quote.author}</p>
+        <p className="relative mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">— {quote.author}</p>
       </Card>
 
       {/* Stat row */}

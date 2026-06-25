@@ -24,7 +24,7 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.error) {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 dark:bg-slate-950">
+        <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 dark:bg-black">
           <div className="card w-full max-w-md p-7 text-center">
             <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400">
               <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -36,7 +36,7 @@ export default class ErrorBoundary extends Component {
               The page hit an unexpected error. Your data is safe in this browser — try again or reload.
             </p>
             {this.state.error?.message && (
-              <pre className="mt-3 max-h-32 overflow-auto rounded-lg bg-slate-100 p-2 text-left text-xs text-rose-600 dark:bg-slate-800 dark:text-rose-300">
+              <pre className="mt-3 max-h-32 overflow-auto rounded-lg bg-slate-100 p-2 text-left text-xs text-rose-600 dark:bg-neutral-800 dark:text-rose-300">
                 {String(this.state.error.message)}
               </pre>
             )}
