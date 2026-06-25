@@ -1,90 +1,222 @@
 import { dayOfYear } from './date'
 
-// A larger curated set of trading + mindset + discipline quotes.
-// The Home "Today's mindset" card shows one per day (deterministic) and the
-// shuffle button picks a random one. Attributions use "Trading proverb" /
-// "Unknown" where a reliable source isn't certain, to avoid misattribution.
+// Real, sourced trading quotes. Every quote below was gathered from a documented
+// source and then independently verified (wording + attribution) against the
+// original book / interview / shareholder letter. Provenance for the whole set
+// is documented in SOURCES.md at the repo root. Each entry carries its `source`,
+// which is shown on the Home "Today's mindset" card.
+//
+// Note on the Livermore quotes: "Reminiscences of a Stock Operator" (1923) is by
+// Edwin Lefèvre, narrated by the character Larry Livingston — a widely-recognized
+// portrait of Jesse Livermore. We credit Lefèvre (the author) and note this in
+// the source. "How to Trade in Stocks" (1940) is Livermore's own book.
+
 export const QUOTES = [
-  // — Trading psychology & risk —
-  { text: 'The goal of a successful trader is to make the best trades. Money is secondary.', author: 'Alexander Elder' },
-  { text: 'Amateurs think about how much money they can make. Professionals think about how much money they could lose.', author: 'Jack Schwager' },
-  { text: 'It’s not whether you’re right or wrong, but how much money you make when right and how much you lose when wrong.', author: 'George Soros' },
-  { text: 'I’m always thinking about losing money as opposed to making money.', author: 'Paul Tudor Jones' },
-  { text: 'Don’t focus on making money; focus on protecting what you have.', author: 'Paul Tudor Jones' },
-  { text: 'The elements of good trading are: cutting losses, cutting losses, and cutting losses.', author: 'Ed Seykota' },
-  { text: 'Risk comes from not knowing what you’re doing.', author: 'Warren Buffett' },
-  { text: 'Letting losses run is the most serious mistake made by most investors.', author: 'William O’Neil' },
-  { text: 'Never let a winner turn into a loser.', author: 'Trading proverb' },
-  { text: 'The market is a device for transferring money from the impatient to the patient.', author: 'Warren Buffett' },
-  { text: 'Markets can remain irrational longer than you can remain solvent.', author: 'John Maynard Keynes' },
-  { text: 'In trading, the impossible happens about twice a year.', author: 'Marty Schwartz' },
-  { text: 'The four most dangerous words in investing are: ‘this time it’s different.’', author: 'Sir John Templeton' },
-  { text: 'Be fearful when others are greedy, and greedy when others are fearful.', author: 'Warren Buffett' },
-  { text: 'Bulls make money, bears make money, pigs get slaughtered.', author: 'Wall Street adage' },
-  { text: 'The trend is your friend until the end when it bends.', author: 'Ed Seykota' },
-  { text: 'There is a time to go long, a time to go short, and a time to go fishing.', author: 'Jesse Livermore' },
-  { text: 'It was never my thinking that made the big money for me. It was my sitting.', author: 'Jesse Livermore' },
-  { text: 'The hard work in trading comes in the preparation. The actual process is effortless.', author: 'Jack Schwager' },
-  { text: 'Every trader has strengths and weaknesses. Use your strengths, minimize your weaknesses.', author: 'Steve Cohen' },
-  { text: 'The best traders have no ego.', author: 'Tom Baldwin' },
-  { text: 'Confidence is not “I will profit on this trade.” Confidence is “I will be fine if I don’t.”', author: 'Yvan Byeajee' },
-  { text: 'Trade what you see, not what you think.', author: 'Trading proverb' },
-  { text: 'Plan the trade and trade the plan.', author: 'Trading proverb' },
-  { text: 'One good trade does not make you a genius; one bad trade does not make you a fool.', author: 'Unknown' },
-  { text: 'The market does not reward effort. It rewards correctness and discipline.', author: 'Unknown' },
-  { text: 'A good trader controls risk. A great trader controls themselves.', author: 'Unknown' },
-  { text: 'Your job is not to predict the market. Your job is to react to it with discipline.', author: 'Trading proverb' },
-  { text: 'The goal is consistency, not a single great trade.', author: 'Trading proverb' },
-  { text: 'Protect your capital and your confidence — both are finite.', author: 'Unknown' },
-  { text: 'Losses are the cost of doing business. Big losses are a choice.', author: 'Unknown' },
-  { text: 'You don’t have to trade today. Cash is a position.', author: 'Trading proverb' },
-  { text: 'The market will be here tomorrow. Make sure your account is too.', author: 'Unknown' },
-  { text: 'Wait for the trade to come to you. Boredom is not a signal.', author: 'Trading proverb' },
-  { text: 'Trade your plan when it’s hard, and you’ll have an edge when it’s easy.', author: 'Unknown' },
-
-  // — Discipline, patience & process —
-  { text: 'Discipline is the bridge between goals and accomplishment.', author: 'Jim Rohn' },
-  { text: 'Discipline equals freedom.', author: 'Jocko Willink' },
-  { text: 'We are what we repeatedly do. Excellence, then, is not an act, but a habit.', author: 'Will Durant' },
-  { text: 'Process over outcome. Execute well and the results follow.', author: 'Trading proverb' },
-  { text: 'Patience is a key attribute of a good trader.', author: 'Trading proverb' },
-  { text: 'Motivation gets you going, but discipline keeps you growing.', author: 'John C. Maxwell' },
-  { text: 'You will never always be motivated. You have to learn to be disciplined.', author: 'Unknown' },
-  { text: 'Small disciplines repeated with consistency lead to great achievements.', author: 'John C. Maxwell' },
-  { text: 'It’s not the daily increase but daily decrease. Hack away at the unessential.', author: 'Bruce Lee' },
-  { text: 'Slow is smooth, and smooth is fast.', author: 'Navy SEAL maxim' },
-  { text: 'How you do anything is how you do everything.', author: 'Unknown' },
-  { text: 'The successful warrior is the average person, with laser-like focus.', author: 'Bruce Lee' },
-  { text: 'Do something today that your future self will thank you for.', author: 'Unknown' },
-  { text: 'Don’t count the days, make the days count.', author: 'Muhammad Ali' },
-
-  // — Mindset, resilience & growth —
-  { text: 'Whether you think you can, or you think you can’t — you’re right.', author: 'Henry Ford' },
-  { text: 'Fall seven times, stand up eight.', author: 'Japanese proverb' },
-  { text: 'Success is not final, failure is not fatal: it is the courage to continue that counts.', author: 'Winston Churchill' },
-  { text: 'It does not matter how slowly you go as long as you do not stop.', author: 'Confucius' },
-  { text: 'Hard work beats talent when talent doesn’t work hard.', author: 'Tim Notke' },
-  { text: 'The only way to do great work is to love what you do.', author: 'Steve Jobs' },
-  { text: 'A river cuts through rock not because of its power, but its persistence.', author: 'Jim Watkins' },
-  { text: 'The man who moves a mountain begins by carrying away small stones.', author: 'Confucius' },
-  { text: 'You miss 100% of the shots you don’t take.', author: 'Wayne Gretzky' },
-  { text: 'What stands in the way becomes the way.', author: 'Marcus Aurelius' },
-  { text: 'You have power over your mind — not outside events. Realize this, and you will find strength.', author: 'Marcus Aurelius' },
-  { text: 'We suffer more often in imagination than in reality.', author: 'Seneca' },
-  { text: 'Luck is what happens when preparation meets opportunity.', author: 'Seneca' },
-  { text: 'The obstacle is the way.', author: 'Ryan Holiday' },
-  { text: 'Quality is not an act, it is a habit.', author: 'Aristotle' },
-  { text: 'Champions keep playing until they get it right.', author: 'Billie Jean King' },
-  { text: 'Pressure is a privilege.', author: 'Billie Jean King' },
-  { text: 'It’s not about perfect. It’s about effort.', author: 'Jillian Michaels' },
-  { text: 'Energy and persistence conquer all things.', author: 'Benjamin Franklin' },
-  { text: 'The expert in anything was once a beginner.', author: 'Helen Hayes' },
-  { text: 'Don’t wish it were easier. Wish you were better.', author: 'Jim Rohn' },
-  { text: 'Comparison is the thief of joy.', author: 'Theodore Roosevelt' },
-  { text: 'Either you run the day, or the day runs you.', author: 'Jim Rohn' },
-  { text: 'The mind is everything. What you think you become.', author: 'Buddha' },
-  { text: 'Knowing yourself is the beginning of all wisdom.', author: 'Aristotle' },
-  { text: 'Mastering others is strength. Mastering yourself is true power.', author: 'Lao Tzu' },
+  {
+    text: 'Don’t focus on making money; focus on protecting what you have.',
+    author: 'Paul Tudor Jones',
+    source: 'Market Wizards: Interviews with Top Traders, Jack D. Schwager (1989)',
+  },
+  {
+    text: 'It never was my thinking that made the big money for me. It always was my sitting. Got that? My sitting tight!',
+    author: 'Edwin Lefèvre',
+    source: 'Reminiscences of a Stock Operator (1923), Ch. V — the fictionalized Jesse Livermore',
+  },
+  {
+    text: 'Win or lose, everybody gets what they want out of the market. Some people seem to like to lose, so they win by losing money.',
+    author: 'Ed Seykota',
+    source: 'Market Wizards, Jack D. Schwager (1989) — Ed Seykota interview',
+  },
+  {
+    text: 'I know where I’m getting out before I get in. The position size on a trade is determined by the stop, and the stop is determined on a technical basis.',
+    author: 'Bruce Kovner',
+    source: 'Market Wizards, Jack D. Schwager (1989) — Bruce Kovner, “The World Trader”',
+  },
+  {
+    text: 'Anything can happen.',
+    author: 'Mark Douglas',
+    source: 'Trading in the Zone (2000) — the first of his “five fundamental truths”',
+  },
+  {
+    text: 'I have two basic rules about winning in trading as well as in life: 1) If you don’t bet, you can’t win. 2) If you lose all your chips, you can’t bet.',
+    author: 'Larry Hite',
+    source: 'Market Wizards, Jack D. Schwager (1989) — “Larry Hite: Respecting Risk”',
+  },
+  {
+    text: 'It is not how likely an event is to happen that matters, it is how much is made when it happens. How frequent the profit is irrelevant; it is the magnitude of the outcome that counts.',
+    author: 'Nassim Nicholas Taleb',
+    source: 'Fooled by Randomness (2001)',
+  },
+  {
+    text: 'When was I able to turn from a loser to a winner? When I was able to separate my ego needs from making money. When I was able to accept being wrong.',
+    author: 'Marty Schwartz',
+    source: 'Market Wizards, Jack D. Schwager (1989) — Marty Schwartz, “Champion Trader”',
+  },
+  {
+    text: 'The big money is not in the buying and the selling, but in the waiting.',
+    author: 'Charlie Munger',
+    source: 'Poor Charlie’s Almanack, ed. Peter D. Kaufman (2005)',
+  },
+  {
+    text: 'The elements of good trading are: 1) cutting losses, 2) cutting losses, and 3) cutting losses.',
+    author: 'Ed Seykota',
+    source: 'Market Wizards, Jack D. Schwager (1989) — Ed Seykota interview',
+  },
+  {
+    text: 'It’s not whether you’re right or wrong that’s important, but how much money you make when you’re right and how much you lose when you’re wrong.',
+    author: 'Stanley Druckenmiller (on George Soros)',
+    source: 'The New Market Wizards, Jack D. Schwager (1992) — Druckenmiller interview',
+  },
+  {
+    text: 'The market does not beat them. They beat themselves, because though they have brains they cannot sit tight.',
+    author: 'Edwin Lefèvre',
+    source: 'Reminiscences of a Stock Operator (1923), Ch. V — the fictionalized Jesse Livermore',
+  },
+  {
+    text: 'A good trader watches his capital as carefully as a professional scuba diver watches his air supply.',
+    author: 'Dr. Alexander Elder',
+    source: 'Trading for a Living (Wiley, 1993)',
+  },
+  {
+    text: 'Undertrade, undertrade, undertrade. Whatever you think your position ought to be, cut it at least in half.',
+    author: 'Bruce Kovner',
+    source: 'Market Wizards, Jack D. Schwager (1989) — Bruce Kovner, “The World Trader”',
+  },
+  {
+    text: 'When you genuinely accept the risks, you will be at peace with any outcome. When you’re at peace with any outcome, you make yourself available to perceive and act on whatever the market is offering.',
+    author: 'Mark Douglas',
+    source: 'Trading in the Zone (2000)',
+  },
+  {
+    text: 'Soros taught me that when you have tremendous conviction on a trade, you have to go for the jugular. It takes courage to be a pig.',
+    author: 'Stanley Druckenmiller',
+    source: 'The New Market Wizards, Jack D. Schwager (1992) — Druckenmiller interview',
+  },
+  {
+    text: 'A loss never bothers me after I take it. I forget it overnight. But being wrong — not taking the loss — that is what does the damage to the pocketbook and to the soul.',
+    author: 'Edwin Lefèvre',
+    source: 'Reminiscences of a Stock Operator (1923), Ch. X — the fictionalized Jesse Livermore',
+  },
+  {
+    text: 'Risk control is the best route to loss avoidance. Risk avoidance, on the other hand, is likely to lead to return avoidance as well.',
+    author: 'Howard Marks',
+    source: 'The Most Important Thing (Columbia University Press, 2011)',
+  },
+  {
+    text: 'The whole secret to winning big in the stock market is not to be right all the time, but to lose the least amount possible when you’re wrong.',
+    author: 'William J. O’Neil',
+    source: 'How to Make Money in Stocks (McGraw-Hill)',
+  },
+  {
+    text: 'If your goal is to trade like a professional and be a consistent winner, you must start from the premise that the solutions are in your mind, not in the market.',
+    author: 'Mark Douglas',
+    source: 'Trading in the Zone (2000)',
+  },
+  {
+    text: 'I just wait until there is money lying in the corner, and all I have to do is go over there and pick it up. I do nothing in the meantime.',
+    author: 'Jim Rogers',
+    source: 'Market Wizards, Jack D. Schwager (1989) — Jim Rogers interview',
+  },
+  {
+    text: '95% of the trading errors you are likely to make will stem from your attitudes about being wrong, losing money, missing out, and leaving money on the table.',
+    author: 'Mark Douglas',
+    source: 'Trading in the Zone (2000) — the four trading fears',
+  },
+  {
+    text: 'No matter how sophisticated our choices, how good we are at dominating the odds, randomness will have the last word.',
+    author: 'Nassim Nicholas Taleb',
+    source: 'Fooled by Randomness (2001)',
+  },
+  {
+    text: 'The fastest way to take a bath in the stock market is to try to prove that you are right and the market is wrong.',
+    author: 'William J. O’Neil',
+    source: 'How to Make Money in Stocks (McGraw-Hill, 1988)',
+  },
+  {
+    text: 'Profits always take care of themselves but losses never do.',
+    author: 'Jesse Livermore',
+    source: 'How to Trade in Stocks (1940), “The Challenge of Speculation”',
+  },
+  {
+    text: 'The way to build long-term returns is through preservation of capital and home runs.',
+    author: 'Stanley Druckenmiller',
+    source: 'The New Market Wizards, Jack D. Schwager (1992)',
+  },
+  {
+    text: 'The investor’s chief problem — and even his worst enemy — is likely to be himself.',
+    author: 'Benjamin Graham',
+    source: 'The Intelligent Investor (1949)',
+  },
+  {
+    text: 'It is when we are unaware of what could go wrong that we have to worry.',
+    author: 'George Soros',
+    source: 'The Alchemy of Finance (1987)',
+  },
+  {
+    text: 'I could give away all my secrets and it wouldn’t make any difference. Most people can’t control their emotions or follow a system.',
+    author: 'Linda Bradford Raschke',
+    source: 'The New Market Wizards, Jack D. Schwager (1992) — Raschke interview',
+  },
+  {
+    text: 'Heroes are heroes because they are heroic in behavior, not because they won or lost.',
+    author: 'Nassim Nicholas Taleb',
+    source: 'Fooled by Randomness (2001)',
+  },
+  {
+    text: 'An intelligent businessman takes only risks that will not put him out of business, even if he makes several mistakes in a row.',
+    author: 'Dr. Alexander Elder',
+    source: 'The New Trading for a Living (Wiley, 2014)',
+  },
+  {
+    text: 'You don’t trade the markets. You trade your beliefs about the markets.',
+    author: 'Van K. Tharp',
+    source: 'Core “Tharp Think” principle — Trade Your Way to Financial Freedom (McGraw-Hill)',
+  },
+  {
+    text: 'We simply attempt to be fearful when others are greedy and to be greedy only when others are fearful.',
+    author: 'Warren Buffett',
+    source: 'Berkshire Hathaway Chairman’s Letter, 1986',
+  },
+  {
+    text: 'The desire for constant action irrespective of underlying conditions is responsible for many losses in Wall Street even among the professionals.',
+    author: 'Edwin Lefèvre',
+    source: 'Reminiscences of a Stock Operator (1923), Ch. II — the fictionalized Jesse Livermore',
+  },
+  {
+    text: 'Losses are simply the cost of doing business — the amount of money I need to spend to make myself available for the winning trades.',
+    author: 'Mark Douglas',
+    source: 'Trading in the Zone (2000)',
+  },
+  {
+    text: 'Rule number one: most things will prove to be cyclical. Rule number two: some of the greatest opportunities come when other people forget rule number one.',
+    author: 'Howard Marks',
+    source: 'The Most Important Thing (2011), “Being Attentive to Cycles”',
+  },
+  {
+    text: 'Confronted with a challenge to distill the secret of sound investment into three words, we venture the motto: margin of safety.',
+    author: 'Benjamin Graham',
+    source: 'The Intelligent Investor (1949), Ch. 20',
+  },
+  {
+    text: 'Markets need a fresh supply of losers just as builders of the ancient pyramids needed a fresh supply of slaves.',
+    author: 'Dr. Alexander Elder',
+    source: 'Trading for a Living (Wiley, 1993)',
+  },
+  {
+    text: 'I’m not entitled to have an opinion unless I can state the arguments against my position better than the people who are in opposition.',
+    author: 'Charlie Munger',
+    source: 'USC Law School Commencement Address (2007); Poor Charlie’s Almanack',
+  },
+  {
+    text: 'Try to change who you are and you will fight yourself all the way — and then wonder, amidst the resistance, why you lack discipline.',
+    author: 'Dr. Brett Steenbarger',
+    source: 'Trading Psychology 2.0 (Wiley, 2015)',
+  },
+  {
+    text: 'Being too far ahead of your time is indistinguishable from being wrong.',
+    author: 'Howard Marks',
+    source: 'The Most Important Thing Illuminated (2013); Oaktree Capital memos',
+  },
 ]
 
 export function quoteForDay(date = new Date()) {
@@ -92,8 +224,7 @@ export function quoteForDay(date = new Date()) {
   return QUOTES[idx]
 }
 
-// Pick a random quote (used by the "shuffle" button). Optionally avoid repeating
-// the one currently shown.
+// Pick a random quote (used by the "shuffle" button), avoiding an immediate repeat.
 export function randomQuote(exclude) {
   if (QUOTES.length <= 1) return QUOTES[0]
   let q = QUOTES[Math.floor(Math.random() * QUOTES.length)]

@@ -6,7 +6,7 @@ A personal, multi-page trading journal & analytics web app. React + Vite, styled
 
 - **PIN lock** — a hashed PIN gate on load (SHA-256, stored hashed; light protection for a personal device).
 - **Light / dark mode** — toggle in the top bar; remembered across sessions.
-- **Home** — daily-rotating motivational quote, today's P&L, account drawdown meters, rules-followed streak, a journal prompt card, and a red warning banner whenever a trade today broke your rules.
+- **Home** — a daily-rotating quote (shuffle button for more) drawn from a **verified, sourced** set of real trading wisdom — Market Wizards, *Reminiscences of a Stock Operator*, Mark Douglas, Buffett's letters, Taleb, Howard Marks, Graham, Munger — each shown with its source (provenance in [SOURCES.md](SOURCES.md)). Plus today's P&L, account drawdown meters, rules-followed streak, a journal prompt card, and a red warning banner whenever a trade today broke your rules.
 - **Trade Log** — manual entry with auto P&L from tick value/size, behavioural tags (SND Setup / Gamble / Revenge / FOMO / Bored), 1–5 quality score, chart screenshot upload, optional journal link, plus **CSV import** (PapaParse) with flexible column mapping.
 - **Journal** — structured **daily** (morning plan + EOD recap), **weekly** summary, and **monthly** review, all prompt-driven.
 - **Analytics** (Chart.js) — equity curve, win/loss by time of day, instrument breakdown, emotion vs P&L, rules-followed vs P&L, and drawdown progression.

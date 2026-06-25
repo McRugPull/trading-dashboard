@@ -85,10 +85,11 @@ export default function Home() {
           </button>
         </div>
 
-        <blockquote className="relative mt-3 text-xl font-medium leading-relaxed text-slate-800 dark:text-slate-50 sm:text-2xl">
+        <blockquote className="relative mt-3 text-lg font-medium leading-relaxed text-slate-800 dark:text-slate-50 sm:text-xl">
           {quote.text}
         </blockquote>
-        <p className="relative mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">— {quote.author}</p>
+        <p className="relative mt-3 text-sm font-semibold text-slate-700 dark:text-slate-200">— {quote.author}</p>
+        <p className="relative mt-0.5 text-xs italic text-slate-400 dark:text-slate-500">{quote.source}</p>
       </Card>
 
       {/* Stat row */}
