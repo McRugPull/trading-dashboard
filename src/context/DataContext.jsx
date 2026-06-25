@@ -30,13 +30,28 @@ export function DataProvider({ children }) {
   const [settings, setSettings] = useState(() => load('settings', { name: 'Preston', apiKey: '' }))
   const [pendingChecklist, setPendingChecklist] = useState(() => load('pendingChecklist', emptyChecklist()))
 
-  // Persist each slice independently.
-  useEffect(() => save('trades', trades), [trades])
-  useEffect(() => save('accounts', accounts), [accounts])
-  useEffect(() => save('journal', journal), [journal])
-  useEffect(() => save('instruments', instruments), [instruments])
-  useEffect(() => save('settings', settings), [settings])
-  useEffect(() => save('pendingChecklist', pendingChecklist), [pendingChecklist])
+  // Persist each slice independently. NOTE: the effect body is wrapped in braces
+  // so it returns `undefined` — `save()` returns a boolean, and returning a
+  // non-function from useEffect makes React try to call it as a cleanup
+  // function on the next run/unmount (e.g. `true()` → TypeError → blank screen).
+  useEffect(() => {
+    save('trades', trades)
+  }, [trades])
+  useEffect(() => {
+    save('accounts', accounts)
+  }, [accounts])
+  useEffect(() => {
+    save('journal', journal)
+  }, [journal])
+  useEffect(() => {
+    save('instruments', instruments)
+  }, [instruments])
+  useEffect(() => {
+    save('settings', settings)
+  }, [settings])
+  useEffect(() => {
+    save('pendingChecklist', pendingChecklist)
+  }, [pendingChecklist])
 
   // ---- Trade ops ----
   function addTrade(data) {

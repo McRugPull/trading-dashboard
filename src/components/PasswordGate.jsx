@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { clearPin, hasPin, isUnlocked, setPin, verifyPin } from '../lib/auth'
+import { clearPin, hasPin, isUnlocked, lock, setPin, verifyPin } from '../lib/auth'
 import { LockIcon } from './Icons'
 import ThemeToggle from './ThemeToggle'
 
@@ -17,6 +17,7 @@ export default function PasswordGate({ children }) {
   // Allow the rest of the app to re-lock by dispatching `ptd:lock`.
   useEffect(() => {
     const onLock = () => {
+      lock() // clear the session flag so a refresh stays locked
       setUnlocked(false)
       setCreating(!hasPin())
       setPinValue('')
