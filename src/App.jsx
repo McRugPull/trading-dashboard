@@ -6,6 +6,7 @@ import PasswordGate from './components/PasswordGate'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import TradeLog from './pages/TradeLog'
+import Calendar from './pages/Calendar'
 import Journal from './pages/Journal'
 import Analytics from './pages/Analytics'
 import Accounts from './pages/Accounts'
@@ -22,6 +23,7 @@ export default function App() {
                 <Route element={<Layout />}>
                   <Route index element={<Home />} />
                   <Route path="trades" element={<TradeLog />} />
+                  <Route path="calendar" element={<Calendar />} />
                   <Route path="journal" element={<Journal />} />
                   <Route path="analytics" element={<Analytics />} />
                   <Route path="accounts" element={<Accounts />} />

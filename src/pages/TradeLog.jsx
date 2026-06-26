@@ -252,7 +252,7 @@ export default function TradeLog() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
                         {t.journalId && (
-                          <Link to="/journal" className="rounded p-1.5 text-slate-400 hover:text-brand-500" title="Linked journal">
+                          <Link to={`/journal?tab=daily&date=${t.journalId}`} className="rounded p-1.5 text-slate-400 hover:text-brand-500" title="Linked journal">
                             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
                               <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>

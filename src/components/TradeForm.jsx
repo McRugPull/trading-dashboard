@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import { calcPnl } from '../lib/pnl'
-import { TAGS, TAG_STYLES, QUALITY_LABELS } from '../lib/constants'
+import { TAG_GROUPS, TAG_STYLES, QUALITY_LABELS } from '../lib/constants'
 import { toDatetimeLocal, dayKey } from '../lib/date'
 import { signedMoney, pnlColor } from '../lib/format'
 import { StarRating } from './ui'
@@ -316,25 +316,34 @@ export default function TradeForm({ initial, onSubmit, submitLabel = 'Log trade'
         </div>
       </div>
 
-      {/* Tags */}
+      {/* Tags (grouped) */}
       <div>
         <label className="label">Tags</label>
-        <div className="flex flex-wrap gap-2">
-          {TAGS.map((tag) => {
-            const active = form.tags.includes(tag)
-            return (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => toggleTag(tag)}
-                className={`chip ${
-                  active ? TAG_STYLES[tag] : 'border-slate-300 text-slate-500 dark:border-neutral-700 dark:text-slate-400'
-                }`}
-              >
-                {tag}
-              </button>
-            )
-          })}
+        <div className="space-y-2.5">
+          {TAG_GROUPS.map((group) => (
+            <div key={group.name}>
+              <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                {group.name}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {group.tags.map((tag) => {
+                  const active = form.tags.includes(tag)
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => toggleTag(tag)}
+                      className={`chip ${
+                        active ? TAG_STYLES[tag] : 'border-slate-300 text-slate-500 dark:border-neutral-700 dark:text-slate-400'
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

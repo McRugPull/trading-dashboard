@@ -285,7 +285,7 @@ function AiTab({ trades, stats, settings, updateSettings }) {
     setLoading(true)
     setInsights('')
     try {
-      const summary = buildSummary({ trades, stats })
+      const summary = buildSummary({ trades })
       const text = await generateInsights({ apiKey: settings.apiKey, summary })
       setInsights(text)
     } catch (e) {

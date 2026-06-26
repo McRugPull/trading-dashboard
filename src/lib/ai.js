@@ -7,31 +7,49 @@
 // should use a key with strict spend limits and never deploy it on a shared or
 // public machine. For anything multi-user, proxy through a backend instead.
 
+import { TAGS } from './constants'
+import {
+  summaryStats,
+  rulesVsPnl,
+  emotionVsPnl,
+  winLossByHour,
+  instrumentBreakdown,
+  rulesStreak,
+} from './analytics'
+import { round2 } from './pnl'
+
 const ENDPOINT = 'https://api.anthropic.com/v1/messages'
 const MODEL = 'claude-sonnet-4-6'
 
-const SYSTEM_PROMPT = `You are an elite trading performance coach reviewing a discretionary futures trader's journal.
-The trader uses a Supply & Demand (SND) methodology with Fibonacci confluence and trades primarily the morning session.
-They track behavioural tags: "SND Setup" is their A+ process; "Gamble", "Revenge", "FOMO", and "Bored" are discipline breaches.
+const SYSTEM_PROMPT = `You are an elite trading performance coach reviewing a discretionary futures trader's REAL trade data — hard numbers, not vibes. The trader uses a Supply & Demand (SND) method with Fibonacci confluence and trades primarily the morning session. Behavioural tags marked "(mistake)" are discipline breaches; the rest are setups/good habits.
 
-Analyse the data provided and respond with SPECIFIC, actionable coaching. Be direct and concrete — reference the actual
-numbers. Structure your response in short markdown sections with these headings:
+Your single job: find where this trader is actually losing money and tell them exactly what to change. Be the sharp coach who looked at the numbers, not a fortune cookie.
 
+NON-NEGOTIABLE RULES:
+- Ground EVERY claim in the specific numbers provided. Quote the actual figures ($, %, counts). If you can't tie a point to a number, cut it.
+- Lead with the single biggest leak in DOLLAR terms — the tag, time-of-day, or instrument cohort that is bleeding the most money — and name the exact damage.
+- BANNED unless tied to a specific number and a specific action: "manage your risk", "stay disciplined", "cut your losses", "be patient", "trust your process", "control your emotions". Generic advice is a failure.
+- If the sample is small (under ~15 trades) say so plainly and give only provisional observations — do not over-read noise.
+- Compare cohorts the trader can act on (rules-followed vs broken, best vs worst hour, by tag). Quantify the gap.
+- Be direct and concise. Specific beats comprehensive.
+
+Respond in markdown with exactly these sections:
+## Bottom line
+(1–2 sentences: the most important finding, with the number.)
 ## What's working
-## What's hurting you
-## Patterns in the data
-## This week's focus
+(Only what the data supports — cite figures. If nothing yet, say so.)
+## Your biggest leak
+(The costliest pattern in dollars: name the tag/time/instrument and the exact damage, e.g. "Your 11 FOMO trades averaged −$84 and cost you −$924 total.")
+## Fix this now
+(2–3 concrete, specific changes tied directly to the data above.)
 
-Rules:
-- Ground every claim in the numbers given. Do not invent data.
-- Prioritise behaviour and risk over prediction. Never give buy/sell signals or market forecasts.
-- Keep it under ~400 words. Use bullet points. End with one single most-important habit to fix.`
+Keep it under ~350 words. End with ONE sentence: the single habit to change this week.`
 
 export async function generateInsights({ apiKey, summary }) {
   if (!apiKey) throw new Error('No API key set. Add your Anthropic API key in the field above.')
 
   const userContent =
-    'Here is my trading data as JSON. Analyse it and coach me.\n\n```json\n' +
+    'Here is my trading data as JSON (all P&L in USD). Analyse it and coach me — cite my actual numbers.\n\n```json\n' +
     JSON.stringify(summary, null, 2) +
     '\n```'
 
@@ -47,7 +65,7 @@ export async function generateInsights({ apiKey, summary }) {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 1500,
+        max_tokens: 1800,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: userContent }],
       }),
@@ -81,13 +99,37 @@ export async function generateInsights({ apiKey, summary }) {
   return text || 'No response text returned.'
 }
 
-// Build a compact, privacy-respecting summary of the trader's data to send.
-// (No screenshots, no journal prose — just numbers and tags.)
-export function buildSummary({ trades, stats }) {
-  const recent = trades
+// Build a rich, privacy-respecting numeric summary so the model can be specific.
+// (No screenshots, no journal prose — just figures and tags.)
+export function buildSummary({ trades }) {
+  const overall = summaryStats(trades)
+  const rules = rulesVsPnl(trades)
+
+  // Which behaviours cost the most money? (only tags that were actually used)
+  const byTag = emotionVsPnl(trades, TAGS)
+    .map((t) => ({ tag: t.tag, trades: t.count, avgPnl: t.avgPnl, totalPnl: t.totalPnl }))
+    .sort((a, b) => a.totalPnl - b.totalPnl) // worst first
+
+  // Best / worst trading hour by net P&L.
+  const hours = winLossByHour(trades).map((h) => ({
+    hour: `${h.hour}:00`,
+    trades: h.wins + h.losses,
+    wins: h.wins,
+    losses: h.losses,
+    netPnl: h.pnl,
+  }))
+  const sortedHours = [...hours].sort((a, b) => b.netPnl - a.netPnl)
+
+  const byInstrument = instrumentBreakdown(trades).map((i) => ({
+    instrument: i.instrument,
+    trades: i.count,
+    netPnl: i.pnl,
+  }))
+
+  const recentTrades = trades
     .slice()
     .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 40)
+    .slice(0, 30)
     .map((t) => ({
       date: t.date,
       instrument: t.instrument,
@@ -98,5 +140,38 @@ export function buildSummary({ trades, stats }) {
       quality: t.quality,
       rulesFollowed: t.rulesFollowed,
     }))
-  return { ...stats, recentTrades: recent }
+
+  return {
+    sampleSize: overall.totalTrades,
+    overall: {
+      netPnl: overall.totalPnl,
+      winRatePct: overall.winRate,
+      wins: overall.wins,
+      losses: overall.losses,
+      avgWin: overall.avgWin,
+      avgLoss: overall.avgLoss,
+      profitFactor: overall.profitFactor === Infinity ? 'all wins (no losses yet)' : overall.profitFactor,
+      expectancyPerTrade: overall.expectancy,
+      bestTrade: overall.bestTrade,
+      worstTrade: overall.worstTrade,
+      avgQuality1to5: overall.avgQuality,
+    },
+    discipline: {
+      currentCleanStreakDays: rulesStreak(trades),
+      rulesFollowedPct: overall.rulesFollowedPct,
+      rulesFollowedTrades: rules.followedCount,
+      rulesFollowedAvgPnl: rules.followedAvg,
+      rulesFollowedTotalPnl: rules.followedTotal,
+      rulesBrokenTrades: rules.brokenCount,
+      rulesBrokenAvgPnl: rules.brokenAvg,
+      rulesBrokenTotalPnl: rules.brokenTotal,
+      costOfBrokenRules: round2(rules.brokenTotal), // negative = money lost on undisciplined trades
+    },
+    byTag,
+    byInstrument,
+    byHour: hours,
+    bestHour: sortedHours[0] || null,
+    worstHour: sortedHours[sortedHours.length - 1] || null,
+    recentTrades,
+  }
 }

@@ -154,6 +154,22 @@ export function rulesVsPnl(trades) {
   }
 }
 
+// Per-day rollups keyed by "YYYY-MM-DD" — feeds the Calendar.
+export function dailyStats(trades) {
+  const map = {}
+  for (const t of trades) {
+    const k = dayKey(t.date)
+    map[k] ||= { date: k, pnl: 0, count: 0, wins: 0, losses: 0, brokeRules: false }
+    const d = map[k]
+    d.pnl = round2(d.pnl + (Number(t.pnl) || 0))
+    d.count++
+    if ((t.pnl || 0) > 0) d.wins++
+    else if ((t.pnl || 0) < 0) d.losses++
+    if (tradeBrokeRules(t)) d.brokeRules = true
+  }
+  return map
+}
+
 // Per-account balance & drawdown derived from that account's assigned trades.
 // Models a trailing drawdown: the floor trails the equity high-water mark.
 export function accountStats(account, trades) {

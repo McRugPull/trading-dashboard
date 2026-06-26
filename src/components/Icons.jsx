@@ -124,6 +124,12 @@ export const TargetIcon = base(
     <circle cx="12" cy="12" r="0.5" />
   </>
 )
+export const CalendarIcon = base(
+  <>
+    <rect x="3" y="4.5" width="18" height="16" rx="2" />
+    <path d="M3 9h18M8 3v3M16 3v3" />
+  </>
+)
 export const RefreshIcon = base(
   <>
     <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
