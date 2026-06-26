@@ -1,45 +1,38 @@
 // Shared domain constants.
 
 // ── Tags ──────────────────────────────────────────────────────────────────
-// SINGLE SOURCE OF TRUTH. Every tag is defined once here with a `type` and a
-// display `group`. Everything else (the trade form, the Trade Log filter, the
-// Analytics emotion chart, the rules-broken logic, the calendar) derives from
-// these exports — so adding a tag below automatically appears everywhere and is
-// classified correctly, with nothing else to update.
+// SINGLE SOURCE OF TRUTH. Two categories only: a TRADE TYPE (the kind of setup)
+// and an EMOTION (how you felt). Everything else — the trade form, the Trade Log
+// filter, the Analytics charts, the rules-broken logic, the calendar — derives
+// from the exports below, so changing a tag here updates the whole app.
 //
-//   type 'good'  → a strong setup / good habit (does NOT count against rules)
-//   type 'setup' → a neutral strategy/context tag (does NOT count against rules)
-//   type 'bad'   → a discipline breach (DOES count as a broken rule)
+//   type 'type' → a kind of trade/setup (neutral; never counts against rules)
+//   type 'good' → a positive emotion (never counts against rules)
+//   type 'bad'  → a negative/undisciplined emotion (DOES count as a broken rule)
 export const TAG_DEFS = [
-  // Setups & strategy
-  { label: 'SND Setup', type: 'good', group: 'Setups' },
-  { label: 'A+ Setup', type: 'good', group: 'Setups' },
-  { label: 'Breakout', type: 'setup', group: 'Setups' },
-  { label: 'Reversal', type: 'setup', group: 'Setups' },
-  { label: 'Trend Continuation', type: 'setup', group: 'Setups' },
-  { label: 'Range', type: 'setup', group: 'Setups' },
-  { label: 'News', type: 'setup', group: 'Setups' },
-  // Execution / good habits
-  { label: 'Followed Plan', type: 'good', group: 'Execution' },
-  { label: 'Patient Entry', type: 'good', group: 'Execution' },
-  { label: 'Took Partial', type: 'good', group: 'Execution' },
-  // Mistakes / discipline breaches
-  { label: 'Gamble', type: 'bad', group: 'Mistakes' },
-  { label: 'Revenge', type: 'bad', group: 'Mistakes' },
-  { label: 'FOMO', type: 'bad', group: 'Mistakes' },
-  { label: 'Bored', type: 'bad', group: 'Mistakes' },
-  { label: 'Overtrading', type: 'bad', group: 'Mistakes' },
-  { label: 'Oversized', type: 'bad', group: 'Mistakes' },
-  { label: 'Moved Stop', type: 'bad', group: 'Mistakes' },
-  { label: 'No Stop Loss', type: 'bad', group: 'Mistakes' },
-  { label: 'Chased', type: 'bad', group: 'Mistakes' },
-  { label: 'Let Loser Run', type: 'bad', group: 'Mistakes' },
+  // Trade type — the kind of setup
+  { label: 'SND Setup', type: 'type', group: 'Trade Type' },
+  { label: 'Breakout', type: 'type', group: 'Trade Type' },
+  { label: 'Reversal', type: 'type', group: 'Trade Type' },
+  { label: 'Trend Continuation', type: 'type', group: 'Trade Type' },
+  { label: 'Range', type: 'type', group: 'Trade Type' },
+  { label: 'News', type: 'type', group: 'Trade Type' },
+  // Emotion — positive
+  { label: 'Calm', type: 'good', group: 'Emotion' },
+  { label: 'Confident', type: 'good', group: 'Emotion' },
+  { label: 'Patient', type: 'good', group: 'Emotion' },
+  // Emotion — negative (counts against your rules-followed streak)
+  { label: 'FOMO', type: 'bad', group: 'Emotion' },
+  { label: 'Revenge', type: 'bad', group: 'Emotion' },
+  { label: 'Greedy', type: 'bad', group: 'Emotion' },
+  { label: 'Anxious', type: 'bad', group: 'Emotion' },
+  { label: 'Bored', type: 'bad', group: 'Emotion' },
 ]
 
 // Full literal class strings (kept literal so Tailwind's JIT picks them up).
 const TYPE_STYLE = {
+  type: 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-700/60 dark:bg-blue-900/30 dark:text-blue-300',
   good: 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-700/60 dark:bg-emerald-900/30 dark:text-emerald-300',
-  setup: 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-700/60 dark:bg-blue-900/30 dark:text-blue-300',
   bad: 'border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-700/60 dark:bg-rose-900/30 dark:text-rose-300',
 }
 
@@ -47,11 +40,15 @@ export const TAGS = TAG_DEFS.map((t) => t.label)
 export const BAD_TAGS = TAG_DEFS.filter((t) => t.type === 'bad').map((t) => t.label)
 export const GOOD_TAGS = TAG_DEFS.filter((t) => t.type !== 'bad').map((t) => t.label)
 
+// Tags split by category (used to keep the Analytics "emotion" chart honest).
+export const TYPE_TAGS = TAG_DEFS.filter((t) => t.group === 'Trade Type').map((t) => t.label)
+export const EMOTION_TAGS = TAG_DEFS.filter((t) => t.group === 'Emotion').map((t) => t.label)
+
 // label → tailwind classes (derived from type)
 export const TAG_STYLES = Object.fromEntries(TAG_DEFS.map((t) => [t.label, TYPE_STYLE[t.type]]))
 
 // Grouped for the trade form UI, in definition order.
-export const TAG_GROUPS = ['Setups', 'Execution', 'Mistakes'].map((name) => ({
+export const TAG_GROUPS = ['Trade Type', 'Emotion'].map((name) => ({
   name,
   tags: TAG_DEFS.filter((t) => t.group === name).map((t) => t.label),
 }))

@@ -15,7 +15,7 @@ import {
 import { Line, Bar } from 'react-chartjs-2'
 import { useData } from '../context/DataContext'
 import { useTheme } from '../context/ThemeContext'
-import { TAGS } from '../lib/constants'
+import { EMOTION_TAGS } from '../lib/constants'
 import {
   summaryStats,
   equityCurve,
@@ -133,7 +133,7 @@ function ChartsTab({ trades, stats }) {
   const dd = useMemo(() => drawdownProgression(trades), [trades])
   const hours = useMemo(() => winLossByHour(trades), [trades])
   const instr = useMemo(() => instrumentBreakdown(trades), [trades])
-  const emotions = useMemo(() => emotionVsPnl(trades, TAGS), [trades])
+  const emotions = useMemo(() => emotionVsPnl(trades, EMOTION_TAGS), [trades])
   const rules = useMemo(() => rulesVsPnl(trades), [trades])
 
   const equityData = {
