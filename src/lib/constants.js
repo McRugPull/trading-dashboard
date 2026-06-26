@@ -58,13 +58,40 @@ export const TAG_GROUPS = ['Setups', 'Execution', 'Mistakes'].map((name) => ({
 
 // ── Pre-trade checklist ─────────────────────────────────────────────────────
 // A trade may only be logged once every item is checked.
+// Ordered top-to-bottom = the real entry sequence (first check → trigger).
+// Session-level checks (daily-loss buffer, morning window, news) are run once at
+// the open, not on every trade, so they live outside this per-setup gate.
 export const CHECKLIST_ITEMS = [
-  { id: 'snd', label: 'SND zone identified', hint: 'Supply/Demand zone marked on the chart.' },
-  { id: 'fib', label: 'Fib confluence', hint: 'Price aligns with a key Fibonacci level.' },
-  { id: 'session', label: 'Morning session only', hint: 'Within your highest-probability trading window.' },
-  { id: 'confirmation', label: 'Confirmation candle waited', hint: 'Did not front-run; waited for the signal candle.' },
-  { id: 'nofomo', label: 'No FOMO entry', hint: 'Not chasing — entering at a planned level.' },
-  { id: 'risk', label: 'Risk defined', hint: 'Stop loss and position size set before entry.' },
+  {
+    id: 'htf-bias',
+    label: 'HTF bias defined — trading with it',
+    hint: 'Mark daily/4H structure (HH-HL = bullish, LH-LL = bearish). One bias word, and this trade goes with it.',
+  },
+  {
+    id: 'snd-zone-holding',
+    label: 'Valid SND zone showing rejection / holding',
+    hint: 'Fresh, unmitigated zone at a Break-of-Structure origin — and price is reacting off it (rejection / hold), not slicing through.',
+  },
+  {
+    id: 'fib-golden-retrace',
+    label: 'Fib set on the swing — retraced into the golden zone',
+    hint: 'On the swing high/low, draw the fib over the impulse leg; price pulling back into the 0.62–0.79 OTE / golden zone (0.705 ideal).',
+  },
+  {
+    id: 'ltf-bos-confirm',
+    label: 'LTF confirmation — BOS / CHoCH in my direction',
+    hint: 'Drop to 5m/1m: a candle BODY closes past the swing (a real break of structure), not just a wick.',
+  },
+  {
+    id: 'stop-set',
+    label: 'Proper stop set at invalidation',
+    hint: 'Hard stop resting in the platform just beyond the zone / swept extreme — the price that proves the idea wrong.',
+  },
+  {
+    id: 'tp-rr',
+    label: 'Proper TP set — R:R worth it',
+    hint: 'Target at the next HTF liquidity/structure; reward is at least ~2× the risk before you take it.',
+  },
 ]
 
 // ── Instruments ─────────────────────────────────────────────────────────────
