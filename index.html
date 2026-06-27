@@ -9,18 +9,8 @@
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     <title>Preston's Trading Dashboard</title>
     <script>
-      // Apply the saved theme before first paint to avoid a flash of the wrong
-      // theme. Defaults to dark unless the user explicitly chose light.
-      (function () {
-        try {
-          var t = localStorage.getItem('ptd.theme');
-          if (t !== 'light') {
-            document.documentElement.classList.add('dark');
-          }
-        } catch (e) {
-          document.documentElement.classList.add('dark');
-        }
-      })();
+      // Dark-only dashboard — always apply the dark theme before first paint.
+      document.documentElement.classList.add('dark');
     </script>
   </head>
   <body>

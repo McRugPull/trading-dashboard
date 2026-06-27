@@ -304,7 +304,7 @@ function AiTab({ trades, stats, settings, updateSettings }) {
           </span>
           <div>
             <h3 className="font-semibold text-slate-900 dark:text-white">AI trade coach</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-slate-600 dark:text-slate-300">
               Sends your trade stats (numbers only — no screenshots or journal text) to Claude (claude-sonnet-4-6) and
               returns focused coaching on what to work on.
             </p>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { clearPin, hasPin, isUnlocked, lock, setPin, verifyPin } from '../lib/auth'
 import { LockIcon } from './Icons'
-import ThemeToggle from './ThemeToggle'
 
 // Wraps the app behind a hashed-PIN lock screen. On first run it asks the user
 // to create a PIN; afterwards it asks to enter it. Unlock lasts for the browser
@@ -67,9 +66,6 @@ export default function PasswordGate({ children }) {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 dark:bg-black">
-      <div className="absolute right-4 top-4">
-        <ThemeToggle />
-      </div>
       <div className="card w-full max-w-sm p-7">
         <div className="mb-5 flex flex-col items-center text-center">
           <span className="mb-3 rounded-2xl bg-brand-600 p-3 text-white">

@@ -1,35 +1,22 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 
 const ThemeContext = createContext(null)
 const KEY = 'ptd.theme'
 
-function getInitial() {
-  try {
-    const saved = localStorage.getItem(KEY)
-    if (saved === 'light' || saved === 'dark') return saved
-  } catch (e) {
-    /* ignore */
-  }
-  // Default to dark — this is a dark-first dashboard.
-  return 'dark'
-}
-
+// Dark-only dashboard. We force the `dark` class on every load and overwrite any
+// previously-saved 'light' preference, so the app is always black. (To bring back
+// a light theme + toggle later, restore the state-based version of this file.)
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(getInitial)
-
   useEffect(() => {
-    const root = document.documentElement
-    root.classList.toggle('dark', theme === 'dark')
+    document.documentElement.classList.add('dark')
     try {
-      localStorage.setItem(KEY, theme)
+      localStorage.setItem(KEY, 'dark')
     } catch (e) {
       /* ignore */
     }
-  }, [theme])
+  }, [])
 
-  const toggle = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
-
-  return <ThemeContext.Provider value={{ theme, setTheme, toggle }}>{children}</ThemeContext.Provider>
+  return <ThemeContext.Provider value={{ theme: 'dark', toggle: () => {}, setTheme: () => {} }}>{children}</ThemeContext.Provider>
 }
 
 export function useTheme() {
