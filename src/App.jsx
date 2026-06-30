@@ -11,6 +11,7 @@ import Journal from './pages/Journal'
 import Analytics from './pages/Analytics'
 import Accounts from './pages/Accounts'
 import Checklist from './pages/Checklist'
+import Settings from './pages/Settings'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
                   <Route path="analytics" element={<Analytics />} />
                   <Route path="accounts" element={<Accounts />} />
                   <Route path="checklist" element={<Checklist />} />
+                  <Route path="settings" element={<Settings />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Route>
               </Routes>

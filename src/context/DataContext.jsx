@@ -27,7 +27,7 @@ export function DataProvider({ children }) {
   const [accounts, setAccounts] = useState(() => load('accounts', []))
   const [journal, setJournal] = useState(() => load('journal', { daily: {}, weekly: {}, monthly: {} }))
   const [instruments, setInstruments] = useState(() => load('instruments', DEFAULT_INSTRUMENTS))
-  const [settings, setSettings] = useState(() => load('settings', { name: 'Preston', apiKey: '' }))
+  const [settings, setSettings] = useState(() => load('settings', { name: '', apiKey: '' }))
   const [pendingChecklist, setPendingChecklist] = useState(() => load('pendingChecklist', emptyChecklist()))
 
   // Persist each slice independently. NOTE: the effect body is wrapped in braces

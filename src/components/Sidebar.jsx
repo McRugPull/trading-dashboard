@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { useData } from '../context/DataContext'
 import {
   ChartIcon,
   CheckSquareIcon,
@@ -8,6 +9,7 @@ import {
   LockIcon,
   WalletIcon,
   CalendarIcon,
+  SettingsIcon,
 } from './Icons'
 
 export const NAV = [
@@ -18,6 +20,7 @@ export const NAV = [
   { to: '/analytics', label: 'Analytics', icon: ChartIcon },
   { to: '/accounts', label: 'Accounts', icon: WalletIcon },
   { to: '/checklist', label: 'Checklist', icon: CheckSquareIcon },
+  { to: '/settings', label: 'Settings', icon: SettingsIcon },
 ]
 
 function linkClass({ isActive }) {
@@ -30,6 +33,8 @@ function linkClass({ isActive }) {
 }
 
 export default function Sidebar() {
+  const { settings } = useData()
+  const name = settings.name?.trim()
   function lock() {
     window.dispatchEvent(new Event('ptd:lock'))
   }
@@ -37,10 +42,10 @@ export default function Sidebar() {
     <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-5 dark:border-neutral-800 dark:bg-neutral-900 md:flex">
       <div className="mb-6 flex items-center gap-3 px-1">
         <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-600 text-base font-black text-white">
-          P
+          {name ? name[0].toUpperCase() : <ChartIcon className="h-5 w-5" />}
         </span>
         <div className="leading-tight">
-          <p className="text-sm font-bold text-slate-900 dark:text-white">Preston&apos;s</p>
+          <p className="text-sm font-bold text-slate-900 dark:text-white">{name ? `${name}’s` : 'My'}</p>
           <p className="text-xs text-slate-500 dark:text-slate-400">Trading Dashboard</p>
         </div>
       </div>

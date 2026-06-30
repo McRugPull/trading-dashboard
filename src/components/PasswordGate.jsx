@@ -71,7 +71,7 @@ export default function PasswordGate({ children }) {
           <span className="mb-3 rounded-2xl bg-brand-600 p-3 text-white">
             <LockIcon className="h-7 w-7" />
           </span>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white">Preston&apos;s Trading Dashboard</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">Trading Dashboard</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {creating ? 'Create a PIN to protect your dashboard.' : 'Enter your PIN to continue.'}
           </p>
