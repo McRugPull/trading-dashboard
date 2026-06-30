@@ -141,6 +141,13 @@ export function DataProvider({ children }) {
       [kind]: { ...prev[kind], [key]: { ...prev[kind]?.[key], ...entry, updatedAt: new Date().toISOString() } },
     }))
   }
+  function deleteJournal(kind, key) {
+    setJournal((prev) => {
+      const bucket = { ...(prev[kind] || {}) }
+      delete bucket[key]
+      return { ...prev, [kind]: bucket }
+    })
+  }
 
   // ---- Instruments ----
   function addInstrument(data) {
@@ -215,6 +222,7 @@ export function DataProvider({ children }) {
     // journal
     getJournal,
     saveJournal,
+    deleteJournal,
     // instruments
     addInstrument,
     removeInstrument,

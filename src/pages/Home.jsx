@@ -2,28 +2,14 @@ import { Link } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import { summaryStats } from '../lib/analytics'
 import { money, signedMoney, pnlColor, pct, money0 } from '../lib/format'
-import { formatLongDate, todayKey, dayOfYear } from '../lib/date'
+import { formatLongDate } from '../lib/date'
 import { Card, StatCard, Meter, PageHeader } from '../components/ui'
-import { AlertIcon, FlameIcon, TrophyIcon, WalletIcon, BookIcon, ChartIcon, TargetIcon } from '../components/Icons'
-
-const JOURNAL_PROMPTS = [
-  'What is your single A+ setup for today, and where will you NOT trade?',
-  'What did yesterday teach you that you can apply right now?',
-  'How is your mindset before the session — calm, rushed, or revenge-y?',
-  'What would make today a win even if you take zero trades?',
-  'Where are you most likely to break a rule today, and how will you prevent it?',
-  'What is your max loss for the day and your plan when you hit it?',
-  'Which emotion derailed you last week, and what is the trigger?',
-]
+import { AlertIcon, FlameIcon, TrophyIcon, WalletIcon, ChartIcon, TargetIcon } from '../components/Icons'
 
 export default function Home() {
-  const { trades, accounts, accountStats, todayPnl, todays, streak, anyRulesBrokenToday, settings, getJournal } =
-    useData()
+  const { trades, accounts, accountStats, todayPnl, todays, streak, anyRulesBrokenToday, settings } = useData()
   const stats = summaryStats(trades)
   const todayStats = summaryStats(todays)
-  const prompt = JOURNAL_PROMPTS[dayOfYear() % JOURNAL_PROMPTS.length]
-  const todayJournal = getJournal('daily', todayKey())
-  const hasMorningPlan = !!todayJournal?.morningPlan?.trim()
 
   return (
     <div>
@@ -78,77 +64,49 @@ export default function Home() {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Account drawdown meters */}
-        <div className="lg:col-span-2">
-          <Card>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
-                <WalletIcon className="h-5 w-5 text-brand-500" /> Account drawdown
-              </h2>
-              <Link to="/accounts" className="text-sm font-medium text-brand-600 hover:underline dark:text-brand-400">
-                Manage →
-              </Link>
-            </div>
-            {accounts.length === 0 ? (
-              <p className="py-6 text-center text-sm text-slate-500 dark:text-slate-400">
-                No accounts yet.{' '}
-                <Link to="/accounts" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
-                  Add a funded account
-                </Link>{' '}
-                to watch your drawdown buffer.
-              </p>
-            ) : (
-              <div className="space-y-5">
-                {accounts.map((acc) => {
-                  const s = accountStats(acc)
-                  return (
-                    <div key={acc.id}>
-                      <div className="mb-1 flex items-center justify-between">
-                        <span className="font-medium text-slate-800 dark:text-slate-100">{acc.name}</span>
-                        <span className="text-sm tabular-nums text-slate-500 dark:text-slate-400">
-                          {money0(s.currentBalance)} · {money(s.remaining)} buffer
-                        </span>
-                      </div>
-                      <Meter
-                        value={s.usedPct}
-                        max={100}
-                        valueLabel={`${pct(s.usedPct)} of ${money0(acc.drawdownLimit)} drawdown`}
-                        label="Used"
-                        dangerHigh
-                      />
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </Card>
+      {/* Account drawdown */}
+      <Card>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
+            <WalletIcon className="h-5 w-5 text-brand-500" /> Account drawdown
+          </h2>
+          <Link to="/accounts" className="text-sm font-medium text-brand-600 hover:underline dark:text-brand-400">
+            Manage →
+          </Link>
         </div>
-
-        {/* Journal prompt */}
-        <div>
-          <Card className="flex h-full flex-col">
-            <h2 className="mb-3 flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
-              <BookIcon className="h-5 w-5 text-brand-500" /> Journal prompt
-            </h2>
-            <p className="flex-1 text-[15px] leading-relaxed text-slate-700 dark:text-slate-200">{prompt}</p>
-            <div className="mt-4">
-              {hasMorningPlan ? (
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-900/20 dark:text-emerald-300">
-                  ✓ Morning plan written for today.
-                  <Link to="/journal" className="ml-1 font-semibold underline underline-offset-2">
-                    Open journal
-                  </Link>
+        {accounts.length === 0 ? (
+          <p className="py-6 text-center text-sm text-slate-500 dark:text-slate-400">
+            No accounts yet.{' '}
+            <Link to="/accounts" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
+              Add a funded account
+            </Link>{' '}
+            to watch your drawdown buffer.
+          </p>
+        ) : (
+          <div className="space-y-5">
+            {accounts.map((acc) => {
+              const s = accountStats(acc)
+              return (
+                <div key={acc.id}>
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="font-medium text-slate-800 dark:text-slate-100">{acc.name}</span>
+                    <span className="text-sm tabular-nums text-slate-500 dark:text-slate-400">
+                      {money0(s.currentBalance)} · {money(s.remaining)} buffer
+                    </span>
+                  </div>
+                  <Meter
+                    value={s.usedPct}
+                    max={100}
+                    valueLabel={`${pct(s.usedPct)} of ${money0(acc.drawdownLimit)} drawdown`}
+                    label="Used"
+                    dangerHigh
+                  />
                 </div>
-              ) : (
-                <Link to="/journal" className="btn-primary w-full">
-                  Write today&apos;s plan
-                </Link>
-              )}
-            </div>
-          </Card>
-        </div>
-      </div>
+              )
+            })}
+          </div>
+        )}
+      </Card>
 
       {/* Today quick glance */}
       {todays.length > 0 && (

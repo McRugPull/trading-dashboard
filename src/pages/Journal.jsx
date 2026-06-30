@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useData } from '../context/DataContext'
-import { Card, PageHeader, EmptyState } from '../components/ui'
-import { BookIcon, PlusIcon, EditIcon } from '../components/Icons'
+import { Card, PageHeader, EmptyState, ConfirmButton } from '../components/ui'
+import { BookIcon, PlusIcon, EditIcon, TrashIcon } from '../components/Icons'
 import { dayKey, weekKey, monthKey, formatDate, formatLongDate } from '../lib/date'
 
 const TABS = [
@@ -48,7 +48,7 @@ function periodLabel(kind, key) {
 }
 
 export default function Journal() {
-  const { journal, getJournal, saveJournal } = useData()
+  const { journal, getJournal, saveJournal, deleteJournal } = useData()
   const [params] = useSearchParams()
 
   // Deep-link support: /journal?tab=daily&date=YYYY-MM-DD (from Calendar / Trade Log)
@@ -195,16 +195,25 @@ export default function Journal() {
           ) : exists ? (
             /* READ MODE */
             <Card>
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-bold text-slate-900 dark:text-white">{periodLabel(tab, periodKey)}</h2>
                   {stored.updatedAt && (
                     <p className="text-xs text-slate-400">Last saved {new Date(stored.updatedAt).toLocaleString()}</p>
                   )}
                 </div>
-                <button className="btn-primary" onClick={startEdit}>
-                  <EditIcon className="h-4 w-4" /> Edit
-                </button>
+                <div className="flex gap-2">
+                  <button className="btn-primary" onClick={startEdit}>
+                    <EditIcon className="h-4 w-4" /> Edit
+                  </button>
+                  <ConfirmButton
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-rose-500 transition hover:border-rose-400 hover:bg-rose-50 dark:border-neutral-700 dark:hover:bg-rose-900/20"
+                    confirmLabel="Delete?"
+                    onConfirm={() => deleteJournal(tab, periodKey)}
+                  >
+                    <TrashIcon className="h-4 w-4" /> Delete
+                  </ConfirmButton>
+                </div>
               </div>
               <div className="space-y-4">
                 {fields.map((f) =>
@@ -246,18 +255,27 @@ export default function Journal() {
               {history.map((h) => {
                 const active = h.key === periodKey
                 return (
-                  <button
+                  <div
                     key={h.key}
-                    onClick={() => openEntry(tab, h.key)}
-                    className={`w-full rounded-xl border p-3 text-left transition ${
+                    className={`flex items-start gap-1 rounded-xl border p-3 transition ${
                       active
                         ? 'border-brand-400 bg-brand-50 dark:border-brand-600 dark:bg-brand-900/20'
                         : 'border-slate-200 bg-white hover:border-brand-300 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-brand-700'
                     }`}
                   >
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{periodLabel(tab, h.key)}</p>
-                    <p className="mt-0.5 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">{h.snippet}</p>
-                  </button>
+                    <button onClick={() => openEntry(tab, h.key)} className="min-w-0 flex-1 text-left">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">{periodLabel(tab, h.key)}</p>
+                      <p className="mt-0.5 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">{h.snippet}</p>
+                    </button>
+                    <ConfirmButton
+                      className="shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-900/20"
+                      confirmLabel={<span className="text-[11px] font-semibold text-rose-500">Sure?</span>}
+                      onConfirm={() => deleteJournal(tab, h.key)}
+                      title="Delete entry"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </ConfirmButton>
+                  </div>
                 )
               })}
             </div>

@@ -54,41 +54,14 @@ export const TAG_GROUPS = ['Trade Type', 'Emotion'].map((name) => ({
 }))
 
 // ── Pre-trade checklist ─────────────────────────────────────────────────────
-// A trade may only be logged once every item is checked.
-// Ordered top-to-bottom = the real entry sequence (first check → trigger).
-// Session-level checks (daily-loss buffer, morning window, news) are run once at
-// the open, not on every trade, so they live outside this per-setup gate.
+// Optional. Ordered top-to-bottom = the real entry sequence. Short and punchy.
 export const CHECKLIST_ITEMS = [
-  {
-    id: 'htf-bias',
-    label: 'HTF bias defined — trading with it',
-    hint: 'Mark daily/4H structure (HH-HL = bullish, LH-LL = bearish). One bias word, and this trade goes with it.',
-  },
-  {
-    id: 'snd-zone-holding',
-    label: 'Valid SND zone showing rejection / holding',
-    hint: 'Fresh, unmitigated zone at a Break-of-Structure origin — and price is reacting off it (rejection / hold), not slicing through.',
-  },
-  {
-    id: 'fib-golden-retrace',
-    label: 'Fib set on the swing — retraced into the golden zone',
-    hint: 'On the swing high/low, draw the fib over the impulse leg; price pulling back into the 0.62–0.79 OTE / golden zone (0.705 ideal).',
-  },
-  {
-    id: 'ltf-bos-confirm',
-    label: 'LTF confirmation — BOS / CHoCH in my direction',
-    hint: 'Drop to 5m/1m: a candle BODY closes past the swing (a real break of structure), not just a wick.',
-  },
-  {
-    id: 'stop-set',
-    label: 'Proper stop set at invalidation',
-    hint: 'Hard stop resting in the platform just beyond the zone / swept extreme — the price that proves the idea wrong.',
-  },
-  {
-    id: 'tp-rr',
-    label: 'Proper TP set — R:R worth it',
-    hint: 'Target at the next HTF liquidity/structure; reward is at least ~2× the risk before you take it.',
-  },
+  { id: 'htf-bias', label: 'HTF bias set', hint: 'Trading with the daily/4H trend.' },
+  { id: 'snd-zone-holding', label: 'Valid SND zone', hint: 'Fresh zone, price reacting off it.' },
+  { id: 'fib-golden-retrace', label: 'Fib golden zone', hint: 'Pulled back into the 0.62–0.79 OTE.' },
+  { id: 'ltf-bos-confirm', label: 'LTF confirmation', hint: 'Body-close BOS / CHoCH my direction.' },
+  { id: 'stop-set', label: 'Stop set', hint: 'Hard stop at invalidation.' },
+  { id: 'tp-rr', label: 'TP set · R:R ≥ 2:1', hint: 'Target at the next liquidity.' },
 ]
 
 // ── Instruments ─────────────────────────────────────────────────────────────

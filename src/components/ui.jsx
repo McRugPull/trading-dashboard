@@ -125,7 +125,7 @@ export function Modal({ open, onClose, title, children, maxWidth = 'max-w-2xl' }
 }
 
 // Click-to-confirm destructive button (two-tap delete; no window.confirm).
-export function ConfirmButton({ onConfirm, children = 'Delete', className = 'btn-danger', confirmLabel = 'Sure?' }) {
+export function ConfirmButton({ onConfirm, children = 'Delete', className = 'btn-danger', confirmLabel = 'Sure?', ...rest }) {
   const [armed, setArmed] = useState(false)
   useEffect(() => {
     if (!armed) return
@@ -134,8 +134,11 @@ export function ConfirmButton({ onConfirm, children = 'Delete', className = 'btn
   }, [armed])
   return (
     <button
+      type="button"
       className={className}
-      onClick={() => {
+      {...rest}
+      onClick={(e) => {
+        e.stopPropagation()
         if (armed) {
           onConfirm?.()
           setArmed(false)

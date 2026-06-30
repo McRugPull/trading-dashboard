@@ -12,7 +12,7 @@ export default function Checklist() {
     <div>
       <PageHeader
         title="Pre-Trade Checklist"
-        subtitle="Every box must be checked before you log a trade. Discipline first, P&L follows."
+        subtitle="Optional — run your A+ entry sequence before you pull the trigger."
         actions={
           <button className="btn-ghost" onClick={resetChecklist}>
             Reset
@@ -84,9 +84,9 @@ export default function Checklist() {
               ) : (
                 <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-center dark:border-amber-700/60 dark:bg-amber-900/20">
                   <AlertIcon className="mx-auto h-8 w-8 text-amber-500" />
-                  <p className="mt-2 font-semibold text-amber-700 dark:text-amber-300">Not ready yet</p>
+                  <p className="mt-2 font-semibold text-amber-700 dark:text-amber-300">Not all checked</p>
                   <p className="mt-1 text-xs text-amber-600/80 dark:text-amber-400/80">
-                    Finish all {CHECKLIST_ITEMS.length} checks before entering.
+                    Tick what&apos;s true for this setup — these are your A+ criteria.
                   </p>
                 </div>
               )}
@@ -96,8 +96,8 @@ export default function Checklist() {
           <Card className="text-sm text-slate-500 dark:text-slate-400">
             <p className="font-semibold text-slate-700 dark:text-slate-200">Why this matters</p>
             <p className="mt-2 leading-relaxed">
-              The Trade Log won&apos;t let you record a trade until this checklist is complete. When you do log one, the
-              checklist state is snapshotted onto the trade so you can review your process later.
+              This checklist is optional — the Trade Log won&apos;t block you. Whatever you have ticked is snapshotted onto
+              the trade when you log it, so you can review how disciplined your entries were later.
             </p>
           </Card>
         </div>

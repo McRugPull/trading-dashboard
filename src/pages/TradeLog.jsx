@@ -4,7 +4,7 @@ import Papa from 'papaparse'
 import { useData } from '../context/DataContext'
 import TradeForm from '../components/TradeForm'
 import { Card, PageHeader, Modal, EmptyState, ConfirmButton } from '../components/ui'
-import { ListIcon, PlusIcon, UploadIcon, EditIcon, ImageIcon } from '../components/Icons'
+import { ListIcon, PlusIcon, UploadIcon, EditIcon, ImageIcon, TrashIcon } from '../components/Icons'
 import { TAGS, TAG_STYLES } from '../lib/constants'
 import { tradeBrokeRules } from '../lib/analytics'
 import { signedMoney, pnlColor, num } from '../lib/format'
@@ -147,7 +147,7 @@ export default function TradeLog() {
           <PlusIcon className="h-5 w-5 text-brand-500" />
           <h2 className="font-semibold text-slate-900 dark:text-white">New trade</h2>
         </div>
-        <TradeForm onSubmit={logNew} submitLabel="Log trade" gateChecklist />
+        <TradeForm onSubmit={logNew} submitLabel="Log trade" />
       </Card>
 
       {/* Filters */}
@@ -265,11 +265,13 @@ export default function TradeLog() {
                           <EditIcon className="h-3.5 w-3.5" /> Edit
                         </button>
                         <ConfirmButton
-                          className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-semibold text-rose-600 transition hover:border-rose-400 hover:bg-rose-50 dark:border-neutral-700 dark:text-rose-400 dark:hover:bg-rose-900/20"
-                          confirmLabel="Delete?"
+                          className="inline-flex items-center justify-center rounded-lg border border-slate-200 px-2 py-1 text-rose-500 transition hover:border-rose-400 hover:bg-rose-50 dark:border-neutral-700 dark:text-rose-400 dark:hover:bg-rose-900/20"
+                          confirmLabel={<span className="text-xs font-semibold">Sure?</span>}
                           onConfirm={() => deleteTrade(t.id)}
+                          title="Delete trade"
+                          aria-label="Delete trade"
                         >
-                          Delete
+                          <TrashIcon className="h-4 w-4" />
                         </ConfirmButton>
                       </div>
                     </td>
@@ -319,11 +321,11 @@ export default function TradeLog() {
                       <EditIcon className="h-3.5 w-3.5" /> Edit
                     </button>
                     <ConfirmButton
-                      className="rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-rose-500 dark:border-neutral-700"
-                      confirmLabel="Delete?"
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-rose-500 dark:border-neutral-700"
+                      confirmLabel="Tap again"
                       onConfirm={() => deleteTrade(t.id)}
                     >
-                      Delete
+                      <TrashIcon className="h-3.5 w-3.5" /> Delete
                     </ConfirmButton>
                   </div>
                 </div>
