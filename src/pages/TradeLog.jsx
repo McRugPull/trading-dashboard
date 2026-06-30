@@ -258,17 +258,18 @@ export default function TradeLog() {
                             </svg>
                           </Link>
                         )}
-                        <button onClick={() => setEditing(t)} className="rounded p-1.5 text-slate-400 hover:text-brand-500" aria-label="Edit">
-                          <EditIcon className="h-4 w-4" />
+                        <button
+                          onClick={() => setEditing(t)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-600 transition hover:border-brand-400 hover:text-brand-600 dark:border-neutral-700 dark:text-slate-200 dark:hover:border-brand-500 dark:hover:text-brand-400"
+                        >
+                          <EditIcon className="h-3.5 w-3.5" /> Edit
                         </button>
                         <ConfirmButton
-                          className="rounded p-1.5 text-slate-400 hover:text-rose-500"
-                          confirmLabel="✓?"
+                          className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-semibold text-rose-600 transition hover:border-rose-400 hover:bg-rose-50 dark:border-neutral-700 dark:text-rose-400 dark:hover:bg-rose-900/20"
+                          confirmLabel="Delete?"
                           onConfirm={() => deleteTrade(t.id)}
                         >
-                          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-                            <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                          Delete
                         </ConfirmButton>
                       </div>
                     </td>
@@ -311,10 +312,17 @@ export default function TradeLog() {
                     {t.quality > 0 ? '★'.repeat(t.quality) : 'Unrated'} · {tradeBrokeRules(t) ? 'Rules broken' : 'Clean'}
                   </span>
                   <div className="flex gap-2">
-                    <button onClick={() => setEditing(t)} className="text-brand-600 dark:text-brand-400">
-                      Edit
+                    <button
+                      onClick={() => setEditing(t)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-brand-600 dark:border-neutral-700 dark:text-brand-400"
+                    >
+                      <EditIcon className="h-3.5 w-3.5" /> Edit
                     </button>
-                    <ConfirmButton className="text-rose-500" confirmLabel="Sure?" onConfirm={() => deleteTrade(t.id)}>
+                    <ConfirmButton
+                      className="rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-rose-500 dark:border-neutral-700"
+                      confirmLabel="Delete?"
+                      onConfirm={() => deleteTrade(t.id)}
+                    >
                       Delete
                     </ConfirmButton>
                   </div>

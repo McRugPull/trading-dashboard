@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import { dailyStats } from '../lib/analytics'
 import { Card, PageHeader, Modal, StatCard } from '../components/ui'
-import { signedMoney, money0, pnlColor, pct } from '../lib/format'
+import { signedMoney, money0, pnlColor } from '../lib/format'
 import { pad, dayKey, formatDateTime, formatLongDate } from '../lib/date'
 import { TAG_STYLES } from '../lib/constants'
 import { CalendarIcon, ChartIcon, BookIcon } from '../components/Icons'
@@ -30,9 +30,6 @@ export default function Calendar() {
   const monthDays = Object.values(stats).filter((s) => s.date.startsWith(monthPrefix))
   const monthPnl = monthDays.reduce((a, s) => a + s.pnl, 0)
   const monthTrades = monthDays.reduce((a, s) => a + s.count, 0)
-  const winDays = monthDays.filter((s) => s.pnl > 0).length
-  const lossDays = monthDays.filter((s) => s.pnl < 0).length
-  const greenRate = winDays + lossDays ? (winDays / (winDays + lossDays)) * 100 : 0
 
   const prev = () => setCursor((c) => { const d = new Date(c.y, c.m - 1, 1); return { y: d.getFullYear(), m: d.getMonth() } })
   const next = () => setCursor((c) => { const d = new Date(c.y, c.m + 1, 1); return { y: d.getFullYear(), m: d.getMonth() } })
@@ -60,10 +57,8 @@ export default function Calendar() {
       />
 
       {/* Month summary */}
-      <div className="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mb-5 grid grid-cols-2 gap-4">
         <StatCard label={`${monthLabel} P&L`} value={signedMoney(monthPnl)} valueClassName={pnlColor(monthPnl)} sub={`${monthTrades} trades`} icon={ChartIcon} />
-        <StatCard label="Green days" value={winDays} sub={`${lossDays} red days`} valueClassName="text-emerald-600 dark:text-emerald-400" />
-        <StatCard label="Green-day rate" value={pct(greenRate)} sub="of days with trades" />
         <StatCard label="Trading days" value={monthDays.length} sub="days you took trades" icon={CalendarIcon} />
       </div>
 

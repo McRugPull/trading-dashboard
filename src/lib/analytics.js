@@ -170,11 +170,16 @@ export function dailyStats(trades) {
   return map
 }
 
-// Per-account balance & drawdown derived from that account's assigned trades.
-// Models a trailing drawdown: the floor trails the equity high-water mark.
+// Per-account balance, drawdown, and profit-target progress from that account's
+// assigned trades. Drawdown is computed per the account's `drawdownType`:
+//   - 'static'            → fixed floor at (start − limit)
+//   - 'trailing-*'        → floor trails the high-water mark but locks once it
+//                           reaches the starting balance (standard prop behaviour)
 export function accountStats(account, trades) {
   const start = Number(account.startingBalance) || 0
   const limit = Number(account.drawdownLimit) || 0
+  const type = account.drawdownType || 'trailing-eod'
+  const profitTarget = Number(account.profitTarget) || 0
   const accTrades = byDateAsc(trades.filter((t) => t.accountId === account.id))
 
   let bal = start
@@ -183,10 +188,14 @@ export function accountStats(account, trades) {
     bal = round2(bal + (Number(t.pnl) || 0))
     hwm = Math.max(hwm, bal)
   }
-  const floor = round2(hwm - limit)
-  const drawdownUsed = round2(hwm - bal) // >= 0, how far below the peak
-  const remaining = round2(bal - floor) // = limit - drawdownUsed
+
+  const floor = type === 'static' ? round2(start - limit) : round2(Math.min(hwm - limit, start))
+  const remaining = round2(bal - floor) // dollars of buffer left to the liquidation floor
+  const drawdownUsed = round2(limit - remaining)
   const usedPct = limit > 0 ? Math.min(100, Math.max(0, round2((drawdownUsed / limit) * 100))) : 0
+
+  const netPnl = round2(bal - start)
+  const profitProgressPct = profitTarget > 0 ? Math.min(100, Math.max(0, round2((netPnl / profitTarget) * 100))) : 0
 
   return {
     currentBalance: bal,
@@ -196,6 +205,9 @@ export function accountStats(account, trades) {
     remaining,
     usedPct,
     tradeCount: accTrades.length,
-    netPnl: round2(bal - start),
+    netPnl,
+    profitTarget,
+    profitProgressPct,
+    targetReached: profitTarget > 0 && netPnl >= profitTarget,
   }
 }

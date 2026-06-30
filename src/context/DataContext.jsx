@@ -106,8 +106,16 @@ export function DataProvider({ children }) {
     const acc = {
       id: uid(),
       name: 'New Account',
+      firm: '',
+      plan: '',
+      phase: 'eval', // 'eval' | 'funded'
       startingBalance: 50000,
-      drawdownLimit: 2000,
+      drawdownLimit: 2000, // = max drawdown / max-loss amount in $
+      drawdownType: 'trailing-eod', // 'trailing-intraday' | 'trailing-eod' | 'static'
+      dailyLossLimit: null,
+      profitTarget: 0,
+      maxContracts: 0,
+      notes: '',
       createdAt: new Date().toISOString(),
       ...data,
     }
