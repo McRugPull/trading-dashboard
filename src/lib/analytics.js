@@ -28,14 +28,17 @@ export function sumPnl(trades) {
   return round2(trades.reduce((acc, t) => acc + (Number(t.pnl) || 0), 0))
 }
 
-// Headline stats for a set of trades.
-export function summaryStats(trades) {
+// Headline stats for a set of trades. `fees` (total daily fees for the period)
+// is subtracted from the net P&L and expectancy so the headline numbers are
+// accurate even when fees are logged once per day rather than per trade.
+export function summaryStats(trades, fees = 0) {
   const total = trades.length
   const wins = trades.filter((t) => (t.pnl || 0) > 0)
   const losses = trades.filter((t) => (t.pnl || 0) < 0)
   const grossWin = sumPnl(wins)
   const grossLoss = sumPnl(losses) // negative
-  const totalPnl = round2(grossWin + grossLoss)
+  const grossPnl = round2(grossWin + grossLoss)
+  const totalPnl = round2(grossPnl - (Number(fees) || 0)) // net of fees
   const followed = trades.filter((t) => !tradeBrokeRules(t))
   const qualityRated = trades.filter((t) => t.quality)
 
@@ -44,6 +47,8 @@ export function summaryStats(trades) {
     wins: wins.length,
     losses: losses.length,
     breakeven: total - wins.length - losses.length,
+    grossPnl,
+    fees: round2(Number(fees) || 0),
     totalPnl,
     winRate: total ? round2((wins.length / total) * 100) : 0,
     avgWin: wins.length ? round2(grossWin / wins.length) : 0,
@@ -155,17 +160,25 @@ export function rulesVsPnl(trades) {
 }
 
 // Per-day rollups keyed by "YYYY-MM-DD" — feeds the Calendar.
-export function dailyStats(trades) {
+export function dailyStats(trades, dailyFees = {}) {
   const map = {}
+  const ensure = (k) =>
+    (map[k] ||= { date: k, pnl: 0, grossPnl: 0, fees: 0, count: 0, wins: 0, losses: 0, brokeRules: false })
   for (const t of trades) {
-    const k = dayKey(t.date)
-    map[k] ||= { date: k, pnl: 0, count: 0, wins: 0, losses: 0, brokeRules: false }
-    const d = map[k]
-    d.pnl = round2(d.pnl + (Number(t.pnl) || 0))
+    const d = ensure(dayKey(t.date))
+    d.grossPnl = round2(d.grossPnl + (Number(t.pnl) || 0))
     d.count++
     if ((t.pnl || 0) > 0) d.wins++
     else if ((t.pnl || 0) < 0) d.losses++
     if (tradeBrokeRules(t)) d.brokeRules = true
+  }
+  // Apply daily fees (include days that have only fees and no trades).
+  for (const k of Object.keys(dailyFees)) {
+    const fee = Number(dailyFees[k]) || 0
+    if (fee) ensure(k).fees = round2(fee)
+  }
+  for (const k of Object.keys(map)) {
+    map[k].pnl = round2(map[k].grossPnl - map[k].fees)
   }
   return map
 }

@@ -9,6 +9,8 @@ import {
   todayTrades,
   tradeBrokeRules,
 } from '../lib/analytics'
+import { todayKey } from '../lib/date'
+import { round2 } from '../lib/pnl'
 
 const DataContext = createContext(null)
 
@@ -29,6 +31,9 @@ export function DataProvider({ children }) {
   const [instruments, setInstruments] = useState(() => load('instruments', DEFAULT_INSTRUMENTS))
   const [settings, setSettings] = useState(() => load('settings', { name: '', apiKey: '' }))
   const [pendingChecklist, setPendingChecklist] = useState(() => load('pendingChecklist', emptyChecklist()))
+  // Total fees per day, keyed by "YYYY-MM-DD" — so you log fees once a day
+  // instead of per trade.
+  const [dailyFees, setDailyFees] = useState(() => load('dailyFees', {}))
 
   // Persist each slice independently. NOTE: the effect body is wrapped in braces
   // so it returns `undefined` — `save()` returns a boolean, and returning a
@@ -52,6 +57,22 @@ export function DataProvider({ children }) {
   useEffect(() => {
     save('pendingChecklist', pendingChecklist)
   }, [pendingChecklist])
+  useEffect(() => {
+    save('dailyFees', dailyFees)
+  }, [dailyFees])
+
+  // ---- Daily fees ----
+  // Set (or clear) the total fees for a given day. Empty/0 removes the entry.
+  function setDailyFee(key, amount) {
+    setDailyFees((prev) => {
+      const next = { ...prev }
+      const n = Number(amount)
+      if (!amount && amount !== 0) delete next[key]
+      else if (!Number.isFinite(n) || n === 0) delete next[key]
+      else next[key] = round2(n)
+      return next
+    })
+  }
 
   // ---- Trade ops ----
   function addTrade(data) {
@@ -187,19 +208,24 @@ export function DataProvider({ children }) {
     setAccounts([])
     setJournal({ daily: {}, weekly: {}, monthly: {} })
     setInstruments(DEFAULT_INSTRUMENTS)
+    setDailyFees({})
     resetChecklist()
   }
 
   // ---- Derived dashboards values ----
   const derived = useMemo(() => {
     const todays = todayTrades(trades)
+    const todayFee = round2(Number(dailyFees[todayKey()]) || 0)
+    const feesTotal = round2(Object.values(dailyFees).reduce((a, v) => a + (Number(v) || 0), 0))
     return {
       todays,
-      todayPnl: sumPnl(todays),
+      todayFee,
+      feesTotal,
+      todayPnl: round2(sumPnl(todays) - todayFee), // net of today's fees
       streak: rulesStreak(trades),
       anyRulesBrokenToday: todays.some(tradeBrokeRules),
     }
-  }, [trades])
+  }, [trades, dailyFees])
 
   const value = {
     // state
@@ -209,6 +235,8 @@ export function DataProvider({ children }) {
     instruments,
     settings,
     pendingChecklist,
+    dailyFees,
+    setDailyFee,
     // trade ops
     addTrade,
     updateTrade,

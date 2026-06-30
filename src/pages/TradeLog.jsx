@@ -7,8 +7,8 @@ import { Card, PageHeader, Modal, EmptyState, ConfirmButton } from '../component
 import { ListIcon, PlusIcon, UploadIcon, EditIcon, ImageIcon, TrashIcon } from '../components/Icons'
 import { TAGS, TAG_STYLES } from '../lib/constants'
 import { tradeBrokeRules } from '../lib/analytics'
-import { signedMoney, pnlColor, num } from '../lib/format'
-import { formatDateTime } from '../lib/date'
+import { signedMoney, pnlColor, num, money } from '../lib/format'
+import { formatDateTime, todayKey } from '../lib/date'
 
 // Map a loose CSV row (any column casing) to a normalized trade.
 function normalizeRow(row, instruments) {
@@ -53,8 +53,9 @@ function normalizeRow(row, instruments) {
 }
 
 export default function TradeLog() {
-  const { trades, accounts, instruments, addTrade, updateTrade, deleteTrade, importTrades, pendingChecklist, resetChecklist } =
+  const { trades, accounts, instruments, addTrade, updateTrade, deleteTrade, importTrades, pendingChecklist, resetChecklist, dailyFees, setDailyFee } =
     useData()
+  const todayK = todayKey()
   const fileRef = useRef(null)
   const [editing, setEditing] = useState(null)
   const [lightbox, setLightbox] = useState(null)
@@ -141,6 +142,29 @@ export default function TradeLog() {
         </div>
       )}
 
+      {/* Today's fees — log fees once a day instead of per trade */}
+      <Card className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="font-semibold text-slate-900 dark:text-white">Today&apos;s fees</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Enter your total commissions for today once — it&apos;s subtracted from today&apos;s P&amp;L (no need to add
+            fees on each trade).
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400">$</span>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            className="input w-32 tabular-nums"
+            placeholder="0.00"
+            value={dailyFees[todayK] ?? ''}
+            onChange={(e) => setDailyFee(todayK, e.target.value)}
+          />
+        </div>
+      </Card>
+
       {/* New trade */}
       <Card className="mb-8">
         <div className="mb-4 flex items-center gap-2">
@@ -178,7 +202,7 @@ export default function TradeLog() {
           message={
             trades.length
               ? 'Try clearing the instrument or tag filter.'
-              : 'Complete your pre-trade checklist, then log your first trade above — or import a CSV.'
+              : 'Log your first trade above — or import a CSV.'
           }
         />
       ) : (

@@ -79,10 +79,10 @@ function ChartCard({ title, subtitle, children }) {
 }
 
 export default function Analytics() {
-  const { trades, settings, updateSettings } = useData()
+  const { trades, settings, updateSettings, feesTotal } = useData()
   const [tab, setTab] = useState('charts')
 
-  const stats = useMemo(() => summaryStats(trades), [trades])
+  const stats = useMemo(() => summaryStats(trades, feesTotal), [trades, feesTotal])
 
   return (
     <div>
@@ -120,7 +120,7 @@ export default function Analytics() {
       ) : tab === 'charts' ? (
         <ChartsTab trades={trades} stats={stats} />
       ) : (
-        <AiTab trades={trades} stats={stats} settings={settings} updateSettings={updateSettings} />
+        <AiTab trades={trades} feesTotal={feesTotal} settings={settings} updateSettings={updateSettings} />
       )}
     </div>
   )
@@ -224,7 +224,7 @@ function ChartsTab({ trades, stats }) {
     <div className="space-y-6">
       {/* Key metrics */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Net P&L" value={signedMoney(stats.totalPnl)} valueClassName={pnlColor(stats.totalPnl)} sub={`${stats.totalTrades} trades`} />
+        <StatCard label="Net P&L" value={signedMoney(stats.totalPnl)} valueClassName={pnlColor(stats.totalPnl)} sub={`${stats.totalTrades} trades${stats.fees ? ` · ${money(stats.fees)} fees` : ''}`} />
         <StatCard label="Win rate" value={pct(stats.winRate)} sub={`${stats.wins}W / ${stats.losses}L`} />
         <StatCard
           label="Profit factor"
@@ -275,7 +275,7 @@ function NoTagData() {
   )
 }
 
-function AiTab({ trades, stats, settings, updateSettings }) {
+function AiTab({ trades, feesTotal, settings, updateSettings }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [insights, setInsights] = useState('')
@@ -285,7 +285,7 @@ function AiTab({ trades, stats, settings, updateSettings }) {
     setLoading(true)
     setInsights('')
     try {
-      const summary = buildSummary({ trades })
+      const summary = buildSummary({ trades, fees: feesTotal })
       const text = await generateInsights({ apiKey: settings.apiKey, summary })
       setInsights(text)
     } catch (e) {

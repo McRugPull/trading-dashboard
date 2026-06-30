@@ -101,8 +101,8 @@ export async function generateInsights({ apiKey, summary }) {
 
 // Build a rich, privacy-respecting numeric summary so the model can be specific.
 // (No screenshots, no journal prose — just figures and tags.)
-export function buildSummary({ trades }) {
-  const overall = summaryStats(trades)
+export function buildSummary({ trades, fees = 0 }) {
+  const overall = summaryStats(trades, fees)
   const rules = rulesVsPnl(trades)
 
   // Which behaviours cost the most money? (only tags that were actually used)
@@ -145,6 +145,8 @@ export function buildSummary({ trades }) {
     sampleSize: overall.totalTrades,
     overall: {
       netPnl: overall.totalPnl,
+      grossPnl: overall.grossPnl,
+      totalFees: overall.fees,
       winRatePct: overall.winRate,
       wins: overall.wins,
       losses: overall.losses,

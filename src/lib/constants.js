@@ -12,20 +12,33 @@
 export const TAG_DEFS = [
   // Trade type — the kind of setup
   { label: 'SND Setup', type: 'type', group: 'Trade Type' },
+  { label: 'Order Block', type: 'type', group: 'Trade Type' },
+  { label: 'Liquidity Grab', type: 'type', group: 'Trade Type' },
+  { label: 'FVG Fill', type: 'type', group: 'Trade Type' },
   { label: 'Breakout', type: 'type', group: 'Trade Type' },
+  { label: 'Failed Breakout', type: 'type', group: 'Trade Type' },
   { label: 'Reversal', type: 'type', group: 'Trade Type' },
   { label: 'Trend Continuation', type: 'type', group: 'Trade Type' },
+  { label: 'Pullback', type: 'type', group: 'Trade Type' },
   { label: 'Range', type: 'type', group: 'Trade Type' },
+  { label: 'Scalp', type: 'type', group: 'Trade Type' },
   { label: 'News', type: 'type', group: 'Trade Type' },
   // Emotion — positive
   { label: 'Calm', type: 'good', group: 'Emotion' },
   { label: 'Confident', type: 'good', group: 'Emotion' },
   { label: 'Patient', type: 'good', group: 'Emotion' },
+  { label: 'Disciplined', type: 'good', group: 'Emotion' },
+  { label: 'Focused', type: 'good', group: 'Emotion' },
   // Emotion — negative (counts against your rules-followed streak)
   { label: 'FOMO', type: 'bad', group: 'Emotion' },
   { label: 'Revenge', type: 'bad', group: 'Emotion' },
   { label: 'Greedy', type: 'bad', group: 'Emotion' },
   { label: 'Anxious', type: 'bad', group: 'Emotion' },
+  { label: 'Fearful', type: 'bad', group: 'Emotion' },
+  { label: 'Impatient', type: 'bad', group: 'Emotion' },
+  { label: 'Hesitant', type: 'bad', group: 'Emotion' },
+  { label: 'Overconfident', type: 'bad', group: 'Emotion' },
+  { label: 'Tilted', type: 'bad', group: 'Emotion' },
   { label: 'Bored', type: 'bad', group: 'Emotion' },
 ]
 

@@ -11,12 +11,12 @@ import { CalendarIcon, ChartIcon, BookIcon } from '../components/Icons'
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 export default function Calendar() {
-  const { trades, accounts } = useData()
+  const { trades, accounts, dailyFees, setDailyFee } = useData()
   const now = new Date()
   const [cursor, setCursor] = useState(() => ({ y: now.getFullYear(), m: now.getMonth() }))
   const [selected, setSelected] = useState(null) // 'YYYY-MM-DD'
 
-  const stats = useMemo(() => dailyStats(trades), [trades])
+  const stats = useMemo(() => dailyStats(trades, dailyFees), [trades, dailyFees])
   const { y, m } = cursor
   const todayKeyStr = dayKey(now)
 
@@ -121,6 +121,9 @@ export default function Calendar() {
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Day P&L</p>
                 <p className={`text-xl font-bold tabular-nums ${pnlColor(selectedStat.pnl)}`}>{signedMoney(selectedStat.pnl)}</p>
+                {selectedStat.fees > 0 && (
+                  <p className="text-[11px] text-slate-400">{signedMoney(selectedStat.grossPnl)} gross</p>
+                )}
               </div>
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Trades</p>
@@ -129,6 +132,21 @@ export default function Calendar() {
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">W / L</p>
                 <p className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">{selectedStat.wins} / {selectedStat.losses}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Fees</p>
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400">$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className="input w-24 px-2 py-1 tabular-nums"
+                    placeholder="0.00"
+                    value={dailyFees[selected] ?? ''}
+                    onChange={(e) => setDailyFee(selected, e.target.value)}
+                  />
+                </div>
               </div>
               <Link
                 to={`/journal?tab=daily&date=${selected}`}

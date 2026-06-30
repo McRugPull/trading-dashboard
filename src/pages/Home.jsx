@@ -7,9 +7,10 @@ import { Card, StatCard, Meter, PageHeader } from '../components/ui'
 import { AlertIcon, FlameIcon, TrophyIcon, WalletIcon, ChartIcon, TargetIcon } from '../components/Icons'
 
 export default function Home() {
-  const { trades, accounts, accountStats, todayPnl, todays, streak, anyRulesBrokenToday, settings } = useData()
-  const stats = summaryStats(trades)
-  const todayStats = summaryStats(todays)
+  const { trades, accounts, accountStats, todayPnl, todays, todayFee, feesTotal, streak, anyRulesBrokenToday, settings } =
+    useData()
+  const stats = summaryStats(trades, feesTotal)
+  const todayStats = summaryStats(todays, todayFee)
 
   return (
     <div>
@@ -37,7 +38,7 @@ export default function Home() {
         <StatCard
           label="Today's P&L"
           value={signedMoney(todayPnl)}
-          sub={`${todays.length} trade${todays.length === 1 ? '' : 's'} today`}
+          sub={`${todays.length} trade${todays.length === 1 ? '' : 's'}${todayFee ? ` · ${money(todayFee)} fees` : ''}`}
           icon={ChartIcon}
           valueClassName={pnlColor(todayPnl)}
         />
@@ -51,7 +52,7 @@ export default function Home() {
         <StatCard
           label="Net P&L (all time)"
           value={signedMoney(stats.totalPnl)}
-          sub={`${stats.totalTrades} trades · ${pct(stats.winRate)} win`}
+          sub={`${stats.totalTrades} trades · ${pct(stats.winRate)} win${feesTotal ? ` · ${money(feesTotal)} fees` : ''}`}
           icon={TrophyIcon}
           valueClassName={pnlColor(stats.totalPnl)}
         />
