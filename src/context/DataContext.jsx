@@ -34,6 +34,10 @@ export function DataProvider({ children }) {
   // Total fees per day, keyed by "YYYY-MM-DD" — so you log fees once a day
   // instead of per trade.
   const [dailyFees, setDailyFees] = useState(() => load('dailyFees', {}))
+  // Playbooks: named strategies with rules; trades reference one via playbookId.
+  const [playbooks, setPlaybooks] = useState(() => load('playbooks', []))
+  // Notebook: freeform notes with a folder label.
+  const [notes, setNotes] = useState(() => load('notes', []))
 
   // Persist each slice independently. NOTE: the effect body is wrapped in braces
   // so it returns `undefined` — `save()` returns a boolean, and returning a
@@ -60,6 +64,12 @@ export function DataProvider({ children }) {
   useEffect(() => {
     save('dailyFees', dailyFees)
   }, [dailyFees])
+  useEffect(() => {
+    save('playbooks', playbooks)
+  }, [playbooks])
+  useEffect(() => {
+    save('notes', notes)
+  }, [notes])
 
   // ---- Daily fees ----
   // Set (or clear) the total fees for a given day. Empty/0 removes the entry.
@@ -74,6 +84,35 @@ export function DataProvider({ children }) {
     })
   }
 
+  // ---- Playbook ops ----
+  function addPlaybook(data) {
+    const pb = { id: uid(), name: 'New Playbook', description: '', rules: [], createdAt: new Date().toISOString(), ...data }
+    setPlaybooks((prev) => [...prev, pb])
+    return pb
+  }
+  function updatePlaybook(id, patch) {
+    setPlaybooks((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)))
+  }
+  function deletePlaybook(id) {
+    setPlaybooks((prev) => prev.filter((p) => p.id !== id))
+    // Unassign trades pointing at it.
+    setTrades((prev) => prev.map((t) => (t.playbookId === id ? { ...t, playbookId: null } : t)))
+  }
+
+  // ---- Notebook ops ----
+  function addNote(data) {
+    const now = new Date().toISOString()
+    const note = { id: uid(), title: 'Untitled note', body: '', folder: 'General', createdAt: now, updatedAt: now, ...data }
+    setNotes((prev) => [note, ...prev])
+    return note
+  }
+  function updateNote(id, patch) {
+    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, ...patch, updatedAt: new Date().toISOString() } : n)))
+  }
+  function deleteNote(id) {
+    setNotes((prev) => prev.filter((n) => n.id !== id))
+  }
+
   // ---- Trade ops ----
   function addTrade(data) {
     const trade = withPnl({
@@ -81,6 +120,9 @@ export function DataProvider({ children }) {
       createdAt: new Date().toISOString(),
       tags: [],
       quality: 0,
+      stopPrice: null,
+      targetPrice: null,
+      playbookId: null,
       rulesFollowed: true,
       accountId: null,
       journalId: null,
@@ -209,6 +251,8 @@ export function DataProvider({ children }) {
     setJournal({ daily: {}, weekly: {}, monthly: {} })
     setInstruments(DEFAULT_INSTRUMENTS)
     setDailyFees({})
+    setPlaybooks([])
+    setNotes([])
     resetChecklist()
   }
 
@@ -237,6 +281,16 @@ export function DataProvider({ children }) {
     pendingChecklist,
     dailyFees,
     setDailyFee,
+    // playbooks
+    playbooks,
+    addPlaybook,
+    updatePlaybook,
+    deletePlaybook,
+    // notebook
+    notes,
+    addNote,
+    updateNote,
+    deleteNote,
     // trade ops
     addTrade,
     updateTrade,

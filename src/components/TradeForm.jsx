@@ -19,6 +19,9 @@ function blankTrade() {
     contracts: 1,
     entry: '',
     exit: '',
+    stopPrice: '',
+    targetPrice: '',
+    playbookId: '',
     fees: 0,
     tags: [],
     quality: 0,
@@ -41,6 +44,9 @@ function fromTrade(t) {
     contracts: t.contracts ?? 1,
     entry: t.entry ?? '',
     exit: t.exit ?? '',
+    stopPrice: t.stopPrice ?? '',
+    targetPrice: t.targetPrice ?? '',
+    playbookId: t.playbookId || '',
     fees: t.fees ?? 0,
     tags: t.tags || [],
     quality: t.quality || 0,
@@ -79,7 +85,7 @@ function resizeImage(file, maxDim = 1100, quality = 0.8) {
 }
 
 export default function TradeForm({ initial, onSubmit, submitLabel = 'Log trade', gateChecklist = false, onCancel }) {
-  const { instruments, accounts, addInstrument, checklistComplete } = useData()
+  const { instruments, accounts, playbooks, addInstrument, checklistComplete } = useData()
   const isEdit = !!initial?.id
   const [form, setForm] = useState(() => (initial ? fromTrade(initial) : blankTrade()))
   const fileRef = useRef(null)
@@ -147,6 +153,9 @@ export default function TradeForm({ initial, onSubmit, submitLabel = 'Log trade'
       contracts: Number(form.contracts) || 0,
       entry: Number(form.entry),
       exit: Number(form.exit),
+      stopPrice: form.stopPrice === '' ? null : Number(form.stopPrice),
+      targetPrice: form.targetPrice === '' ? null : Number(form.targetPrice),
+      playbookId: form.playbookId || null,
       fees: Number(form.fees) || 0,
       tags: form.tags,
       quality: form.quality,
@@ -295,6 +304,42 @@ export default function TradeForm({ initial, onSubmit, submitLabel = 'Log trade'
           />
         </div>
         <div>
+          <label className="label">Stop loss</label>
+          <input
+            type="number"
+            step="any"
+            className="input"
+            value={form.stopPrice}
+            onChange={(e) => set({ stopPrice: e.target.value })}
+            placeholder="for R-multiple"
+          />
+        </div>
+        <div>
+          <label className="label">Target</label>
+          <input
+            type="number"
+            step="any"
+            className="input"
+            value={form.targetPrice}
+            onChange={(e) => set({ targetPrice: e.target.value })}
+            placeholder="optional"
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label className="label">Playbook</label>
+          <select className="input" value={form.playbookId} onChange={(e) => set({ playbookId: e.target.value })}>
+            <option value="">— None —</option>
+            {playbooks.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label className="label">Fees ($)</label>
           <input
             type="number"
@@ -303,6 +348,18 @@ export default function TradeForm({ initial, onSubmit, submitLabel = 'Log trade'
             value={form.fees}
             onChange={(e) => set({ fees: e.target.value })}
           />
+        </div>
+        <div>
+          <label className="label">Planned R:R</label>
+          <div className="input flex items-center tabular-nums text-slate-500 dark:text-slate-300">
+            {(() => {
+              const e = Number(form.entry)
+              const s = Number(form.stopPrice)
+              const t = Number(form.targetPrice)
+              if (![e, s, t].every(Number.isFinite) || e === s) return '—'
+              return (Math.abs(t - e) / Math.abs(e - s)).toFixed(2) + ' : 1'
+            })()}
+          </div>
         </div>
         <div>
           <label className="label">Calculated P&amp;L</label>

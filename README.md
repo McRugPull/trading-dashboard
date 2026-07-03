@@ -6,7 +6,11 @@ A personal, multi-page trading journal & analytics web app. React + Vite, styled
 
 - **PIN lock** — a hashed PIN gate on load (SHA-256, stored hashed; light protection for a personal device).
 - **Light / dark mode** — toggle in the top bar; remembered across sessions.
-- **Home** — today's P&L, account drawdown meters, rules-followed streak, a journal prompt card, and a red warning banner whenever a trade today broke your rules.
+- **Dashboard** — TradeZella-style overview: seven stat tiles (net P&L, today, trade expectancy, profit factor, win rate, day win %, avg win/loss), an **Edge Score** radar (Zella-Score-style composite: profit factor 25%, avg win/loss 20%, max drawdown 20%, win % 15%, recovery factor 10%, consistency 10%), cumulative P&L, net daily P&L bars, streaks, account drawdown, and recent trades.
+- **Playbook** — define each setup with its rules; every playbook tracks its own net P&L, win rate, expectancy, and avg R-multiple from the trades you assign to it.
+- **Notebook** — freeform notes with folders and search, autosaved.
+- **Reports** (Analytics tab) — performance broken down by day of week, time of day, month, instrument, long/short, trade type, emotion, playbook, and quality — plus a winners-vs-losers comparison.
+- **R-multiples** — enter a stop (and target) on each trade to get realized R, planned R:R, and per-playbook avg R.
 - **Trade Log** — manual entry with auto P&L from tick value/size, **20 grouped behavioural tags** (Setups / Execution / Mistakes), 1–5 quality score, chart screenshot upload, optional journal link, plus **CSV import** (PapaParse) with flexible column mapping. Tags are defined once in `constants.js`, so they flow automatically to the form, filter, charts, calendar, and rules logic.
 - **Calendar** — a monthly P&L calendar: each day color-coded green/red by net P&L with trade count, a ⚠ on rule-broken days, and click-through to that day's trades and journal.
 - **Journal** — structured **daily** (morning plan + EOD recap), **weekly** summary, and **monthly** review, all prompt-driven, with a **past-entries browser** to revisit anything you've written. Deep-linkable from the Calendar and Trade Log.

@@ -5,9 +5,9 @@ import { useData } from '../context/DataContext'
 import TradeForm from '../components/TradeForm'
 import { Card, PageHeader, Modal, EmptyState, ConfirmButton } from '../components/ui'
 import { ListIcon, PlusIcon, UploadIcon, EditIcon, ImageIcon, TrashIcon } from '../components/Icons'
-import { TAGS, TAG_STYLES } from '../lib/constants'
-import { tradeBrokeRules } from '../lib/analytics'
-import { signedMoney, pnlColor, num, money } from '../lib/format'
+import { TAGS, TAG_STYLES, CHECKLIST_ITEMS } from '../lib/constants'
+import { tradeBrokeRules, summaryStats, tradeR } from '../lib/analytics'
+import { signedMoney, pnlColor, num, money, pct } from '../lib/format'
 import { formatDateTime, todayKey } from '../lib/date'
 
 // Map a loose CSV row (any column casing) to a normalized trade.
@@ -58,6 +58,7 @@ export default function TradeLog() {
   const todayK = todayKey()
   const fileRef = useRef(null)
   const [editing, setEditing] = useState(null)
+  const [detail, setDetail] = useState(null)
   const [lightbox, setLightbox] = useState(null)
   const [query, setQuery] = useState('')
   const [tagFilter, setTagFilter] = useState('')
@@ -118,6 +119,9 @@ export default function TradeLog() {
       .sort((a, b) => new Date(b.date) - new Date(a.date))
   }, [trades, query, tagFilter])
 
+  const fStats = useMemo(() => summaryStats(filtered), [filtered])
+  const fWl = Math.abs(fStats.avgLoss) > 0 ? fStats.avgWin / Math.abs(fStats.avgLoss) : fStats.avgWin > 0 ? Infinity : 0
+
   return (
     <div>
       <PageHeader
@@ -174,6 +178,16 @@ export default function TradeLog() {
         <TradeForm onSubmit={logNew} submitLabel="Log trade" />
       </Card>
 
+      {/* Filtered-set summary (TradeZella-style header cards) */}
+      {filtered.length > 0 && (
+        <div id="trade-summary" className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <SummaryCard label="Net P&L" value={signedMoney(fStats.totalPnl)} className={pnlColor(fStats.totalPnl)} />
+          <SummaryCard label="Profit factor" value={fStats.profitFactor === Infinity ? '∞' : num(fStats.profitFactor)} />
+          <SummaryCard label="Win rate" value={pct(fStats.winRate)} />
+          <SummaryCard label="Avg win / loss" value={fWl === Infinity ? '∞' : num(fWl)} />
+        </div>
+      )}
+
       {/* Filters */}
       <div id="trade-list" className="mb-4 flex flex-wrap items-center gap-3">
         <input
@@ -218,6 +232,7 @@ export default function TradeLog() {
                   <th className="px-4 py-3 font-medium">Qty</th>
                   <th className="px-4 py-3 font-medium">Entry → Exit</th>
                   <th className="px-4 py-3 text-right font-medium">P&amp;L</th>
+                  <th className="px-4 py-3 text-right font-medium">R</th>
                   <th className="px-4 py-3 font-medium">Tags / Quality</th>
                   <th className="px-4 py-3 font-medium">Rules</th>
                   <th className="px-4 py-3" />
@@ -233,7 +248,9 @@ export default function TradeLog() {
                       )}
                     </td>
                     <td className="px-4 py-3 font-semibold text-slate-900 dark:text-white">
-                      {t.instrument}
+                      <button onClick={() => setDetail(t)} className="hover:text-brand-500 hover:underline" title="View trade details">
+                        {t.instrument}
+                      </button>
                       {t.screenshot && (
                         <button onClick={() => setLightbox(t.screenshot)} className="ml-2 align-middle text-slate-400 hover:text-brand-500" aria-label="View chart">
                           <ImageIcon className="inline h-4 w-4" />
@@ -251,6 +268,12 @@ export default function TradeLog() {
                     </td>
                     <td className={`px-4 py-3 text-right font-bold tabular-nums ${pnlColor(t.pnl)}`}>
                       {signedMoney(t.pnl)}
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums text-slate-500 dark:text-slate-400">
+                      {(() => {
+                        const r = tradeR(t)
+                        return r == null ? '—' : `${num(r)}R`
+                      })()}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
@@ -364,10 +387,129 @@ export default function TradeLog() {
         {editing && <TradeForm initial={editing} onSubmit={saveEdit} submitLabel="Save changes" onCancel={() => setEditing(null)} />}
       </Modal>
 
+      {/* Trade detail modal */}
+      <Modal open={!!detail} onClose={() => setDetail(null)} title={detail ? `${detail.instrument} · ${formatDateTime(detail.date)}` : ''} maxWidth="max-w-2xl">
+        {detail && (
+          <TradeDetail
+            trade={detail}
+            accountName={accountName(detail.accountId)}
+            onEdit={() => {
+              setEditing(detail)
+              setDetail(null)
+            }}
+          />
+        )}
+      </Modal>
+
       {/* Screenshot lightbox */}
       <Modal open={!!lightbox} onClose={() => setLightbox(null)} title="Chart screenshot" maxWidth="max-w-4xl">
         {lightbox && <img src={lightbox} alt="trade chart" className="mx-auto max-h-[70vh] rounded-lg" />}
       </Modal>
+    </div>
+  )
+}
+
+function SummaryCard({ label, value, className = '' }) {
+  return (
+    <div className="card !rounded-xl p-3">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</p>
+      <p className={`mt-0.5 text-lg font-bold tabular-nums ${className || 'text-slate-900 dark:text-white'}`}>{value}</p>
+    </div>
+  )
+}
+
+// Full breakdown of a single trade — TradeZella-style trade detail.
+function TradeDetail({ trade: t, accountName, onEdit }) {
+  const { playbooks } = useData()
+  const pb = playbooks.find((p) => p.id === t.playbookId)
+  const realizedR = tradeR(t)
+  const e = Number(t.entry)
+  const stop = Number(t.stopPrice)
+  const target = Number(t.targetPrice)
+  const plannedR =
+    [e, stop, target].every(Number.isFinite) && e !== stop ? Math.abs(target - e) / Math.abs(e - stop) : null
+  const checklist = t.checklist || null
+  const checkedCount = checklist ? CHECKLIST_ITEMS.filter((i) => checklist[i.id]).length : null
+
+  const Row = ({ label, children }) => (
+    <div className="flex items-center justify-between border-b border-slate-100 py-2 text-sm last:border-0 dark:border-neutral-800">
+      <span className="text-slate-500 dark:text-slate-400">{label}</span>
+      <span className="text-right font-medium text-slate-900 dark:text-white">{children}</span>
+    </div>
+  )
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-50 p-3 dark:bg-neutral-800/50">
+        <div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Net P&L</p>
+          <p className={`text-2xl font-black tabular-nums ${pnlColor(t.pnl)}`}>{signedMoney(t.pnl)}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-slate-500 dark:text-slate-400">R-multiple</p>
+          <p className={`text-2xl font-black tabular-nums ${realizedR == null ? 'text-slate-400' : realizedR >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+            {realizedR == null ? '—' : `${num(realizedR)}R`}
+          </p>
+        </div>
+        <button className="btn-primary" onClick={onEdit}>
+          <EditIcon className="h-4 w-4" /> Edit trade
+        </button>
+      </div>
+
+      <div className="grid gap-x-6 sm:grid-cols-2">
+        <div>
+          <Row label="Direction">
+            <span className={t.direction === 'short' ? 'text-rose-500' : 'text-emerald-500'}>{t.direction}</span>
+          </Row>
+          <Row label="Contracts">{t.contracts}</Row>
+          <Row label="Entry → Exit">
+            {num(t.entry)} → {num(t.exit)}
+          </Row>
+          <Row label="Stop / Target">
+            {Number.isFinite(stop) ? num(stop) : '—'} / {Number.isFinite(target) ? num(target) : '—'}
+          </Row>
+          <Row label="Planned R:R">{plannedR != null ? `${num(plannedR)} : 1` : '—'}</Row>
+        </div>
+        <div>
+          <Row label="Account">{accountName || '—'}</Row>
+          <Row label="Playbook">{pb?.name || '—'}</Row>
+          <Row label="Quality">{t.quality ? '★'.repeat(t.quality) : 'Unrated'}</Row>
+          <Row label="Rules">
+            {tradeBrokeRules(t) ? <span className="text-rose-500">Broken</span> : <span className="text-emerald-500">Followed</span>}
+          </Row>
+          <Row label="Fees (per-trade)">{money(t.fees || 0)}</Row>
+        </div>
+      </div>
+
+      {(t.tags || []).length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {t.tags.map((tag) => (
+            <span key={tag} className={`chip ${TAG_STYLES[tag] || ''}`}>
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {checkedCount != null && (
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Pre-trade checklist at entry: <span className="font-semibold text-slate-700 dark:text-slate-200">{checkedCount}/{CHECKLIST_ITEMS.length}</span> checked
+        </p>
+      )}
+
+      {t.notes && (
+        <div className="rounded-xl bg-slate-50 p-3 text-sm leading-relaxed text-slate-700 dark:bg-neutral-800/50 dark:text-slate-200">
+          {t.notes}
+        </div>
+      )}
+
+      {t.screenshot && <img src={t.screenshot} alt="trade chart" className="max-h-80 w-full rounded-xl object-contain" />}
+
+      {t.journalId && (
+        <Link to={`/journal?tab=daily&date=${t.journalId}`} className="btn-ghost w-full">
+          Open the journal for this day
+        </Link>
+      )}
     </div>
   )
 }

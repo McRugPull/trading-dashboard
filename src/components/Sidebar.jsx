@@ -10,13 +10,16 @@ import {
   WalletIcon,
   CalendarIcon,
   SettingsIcon,
+  TargetIcon,
 } from './Icons'
 
 export const NAV = [
-  { to: '/', label: 'Home', icon: HomeIcon, end: true },
+  { to: '/', label: 'Dashboard', icon: HomeIcon, end: true },
   { to: '/trades', label: 'Trade Log', icon: ListIcon },
   { to: '/calendar', label: 'Calendar', icon: CalendarIcon },
   { to: '/journal', label: 'Journal', icon: BookIcon },
+  { to: '/notebook', label: 'Notebook', icon: BookIcon },
+  { to: '/playbook', label: 'Playbook', icon: TargetIcon },
   { to: '/analytics', label: 'Analytics', icon: ChartIcon },
   { to: '/accounts', label: 'Accounts', icon: WalletIcon },
   { to: '/checklist', label: 'Checklist', icon: CheckSquareIcon },

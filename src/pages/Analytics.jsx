@@ -24,7 +24,11 @@ import {
   instrumentBreakdown,
   emotionVsPnl,
   rulesVsPnl,
+  reportBy,
+  winsVsLosses,
 } from '../lib/analytics'
+import { TYPE_TAGS } from '../lib/constants'
+import { hourOfDay, dayKey } from '../lib/date'
 import { Card, PageHeader, EmptyState, StatCard } from '../components/ui'
 import { ChartIcon, SparkIcon } from '../components/Icons'
 import { money, signedMoney, pnlColor, pct, num } from '../lib/format'
@@ -100,6 +104,14 @@ export default function Analytics() {
               Charts
             </button>
             <button
+              onClick={() => setTab('reports')}
+              className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
+                tab === 'reports' ? 'bg-brand-600 text-white' : 'text-slate-600 dark:text-slate-300'
+              }`}
+            >
+              Reports
+            </button>
+            <button
               onClick={() => setTab('ai')}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
                 tab === 'ai' ? 'bg-brand-600 text-white' : 'text-slate-600 dark:text-slate-300'
@@ -119,6 +131,8 @@ export default function Analytics() {
         />
       ) : tab === 'charts' ? (
         <ChartsTab trades={trades} stats={stats} />
+      ) : tab === 'reports' ? (
+        <ReportsTab trades={trades} />
       ) : (
         <AiTab trades={trades} feesTotal={feesTotal} settings={settings} updateSettings={updateSettings} />
       )}
@@ -417,5 +431,218 @@ function inline(text) {
     ) : (
       <span key={i}>{p}</span>
     )
+  )
+}
+
+// ─── Reports tab ─────────────────────────────────────────────────────────────
+const WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+const DIMENSIONS = [
+  { id: 'dow', label: 'Day of week' },
+  { id: 'hour', label: 'Time of day' },
+  { id: 'month', label: 'Month' },
+  { id: 'instrument', label: 'Instrument' },
+  { id: 'side', label: 'Long vs Short' },
+  { id: 'type', label: 'Trade type' },
+  { id: 'emotion', label: 'Emotion' },
+  { id: 'playbook', label: 'Playbook' },
+  { id: 'quality', label: 'Quality rating' },
+]
+
+function ReportsTab({ trades }) {
+  const { playbooks } = useData()
+  const { base } = useChartTheme()
+  const [dim, setDim] = useState('dow')
+
+  const rows = useMemo(() => {
+    const pbName = (id) => playbooks.find((p) => p.id === id)?.name
+    const keyFns = {
+      dow: (t) => {
+        const [y, m, d] = dayKey(t.date).split('-').map(Number)
+        return `${new Date(y, m - 1, d).getDay()}|${WEEKDAY_NAMES[new Date(y, m - 1, d).getDay()]}`
+      },
+      hour: (t) => {
+        const h = hourOfDay(t.date)
+        return h == null ? null : `${String(h).padStart(2, '0')}|${h}:00`
+      },
+      month: (t) => {
+        const k = dayKey(t.date).slice(0, 7)
+        return `${k}|${k}`
+      },
+      instrument: (t) => (t.instrument ? `${t.instrument}|${t.instrument}` : null),
+      side: (t) => (t.direction === 'short' ? '1|Short' : '0|Long'),
+      type: (t) => (t.tags || []).filter((tag) => TYPE_TAGS.includes(tag)).map((tag) => `${tag}|${tag}`),
+      emotion: (t) => (t.tags || []).filter((tag) => EMOTION_TAGS.includes(tag)).map((tag) => `${tag}|${tag}`),
+      playbook: (t) => (t.playbookId && pbName(t.playbookId) ? `${pbName(t.playbookId)}|${pbName(t.playbookId)}` : null),
+      quality: (t) => (t.quality ? `${t.quality}|${'★'.repeat(t.quality)}` : null),
+    }
+    const raw = reportBy(trades, keyFns[dim])
+    return raw
+      .map((r) => ({ ...r, sortKey: r.bucket.split('|')[0], label: r.bucket.split('|')[1] }))
+      .sort((a, b) => (a.sortKey < b.sortKey ? -1 : 1))
+  }, [trades, dim, playbooks])
+
+  const wl = useMemo(() => winsVsLosses(trades), [trades])
+
+  const best = rows.length ? rows.reduce((a, b) => (b.netPnl > a.netPnl ? b : a)) : null
+  const worst = rows.length ? rows.reduce((a, b) => (b.netPnl < a.netPnl ? b : a)) : null
+  const active = rows.length ? rows.reduce((a, b) => (b.trades > a.trades ? b : a)) : null
+  const bestWin = rows.length ? rows.reduce((a, b) => (b.winRate > a.winRate ? b : a)) : null
+
+  const moneyTip = {
+    plugins: {
+      ...base.plugins,
+      tooltip: { ...base.plugins.tooltip, callbacks: { label: (c) => money(c.parsed.y ?? c.parsed) } },
+    },
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Dimension picker */}
+      <div className="flex flex-wrap gap-2">
+        {DIMENSIONS.map((d) => (
+          <button
+            key={d.id}
+            onClick={() => setDim(d.id)}
+            className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
+              dim === d.id
+                ? 'bg-brand-600 text-white'
+                : 'border border-slate-200 text-slate-600 hover:border-brand-400 dark:border-neutral-700 dark:text-slate-300'
+            }`}
+          >
+            {d.label}
+          </button>
+        ))}
+      </div>
+
+      {rows.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400 dark:border-neutral-700">
+          No data for this breakdown yet — tag/assign your trades and it fills in.
+        </p>
+      ) : (
+        <>
+          {/* Summary cards */}
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <ReportCard title="Best" value={best.label} sub={signedMoney(best.netPnl)} subClass={pnlColor(best.netPnl)} />
+            <ReportCard title="Worst" value={worst.label} sub={signedMoney(worst.netPnl)} subClass={pnlColor(worst.netPnl)} />
+            <ReportCard title="Most active" value={active.label} sub={`${active.trades} trades`} />
+            <ReportCard title="Highest win rate" value={bestWin.label} sub={pct(bestWin.winRate)} />
+          </div>
+
+          {/* Chart */}
+          <Card>
+            <h3 className="mb-3 font-semibold text-slate-900 dark:text-white">
+              Net P&L by {DIMENSIONS.find((d) => d.id === dim)?.label.toLowerCase()}
+            </h3>
+            <div className="h-64">
+              <Bar
+                data={{
+                  labels: rows.map((r) => r.label),
+                  datasets: [
+                    {
+                      label: 'Net P&L',
+                      data: rows.map((r) => r.netPnl),
+                      backgroundColor: rows.map((r) => (r.netPnl >= 0 ? GREEN : RED)),
+                      borderRadius: 4,
+                    },
+                  ],
+                }}
+                options={{ ...base, ...moneyTip }}
+              />
+            </div>
+          </Card>
+
+          {/* Table */}
+          <Card className="overflow-x-auto !p-0">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500 dark:bg-neutral-800/50 dark:text-slate-400">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Bucket</th>
+                  <th className="px-4 py-3 text-right font-medium">Trades</th>
+                  <th className="px-4 py-3 text-right font-medium">Net P&L</th>
+                  <th className="px-4 py-3 text-right font-medium">Win %</th>
+                  <th className="px-4 py-3 text-right font-medium">Avg win</th>
+                  <th className="px-4 py-3 text-right font-medium">Avg loss</th>
+                  <th className="px-4 py-3 text-right font-medium">Expectancy</th>
+                  <th className="px-4 py-3 text-right font-medium">PF</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
+                {rows.map((r) => (
+                  <tr key={r.bucket} className="bg-white dark:bg-neutral-900">
+                    <td className="px-4 py-2.5 font-semibold text-slate-900 dark:text-white">{r.label}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{r.trades}</td>
+                    <td className={`px-4 py-2.5 text-right font-bold tabular-nums ${pnlColor(r.netPnl)}`}>{signedMoney(r.netPnl)}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{pct(r.winRate)}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-emerald-500">{money(r.avgWin)}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-rose-500">{money(Math.abs(r.avgLoss))}</td>
+                    <td className={`px-4 py-2.5 text-right tabular-nums ${pnlColor(r.expectancy)}`}>{signedMoney(r.expectancy)}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">{r.profitFactor === Infinity ? '∞' : num(r.profitFactor)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        </>
+      )}
+
+      {/* Winners vs Losers */}
+      {(wl.winners || wl.losers) && (
+        <Card>
+          <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">Winners vs losers</h3>
+          <p className="mb-4 text-xs text-slate-500 dark:text-slate-400">
+            What your winning trades have in common that your losers don&apos;t.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <WlColumn title="Winning trades" data={wl.winners} tone="emerald" />
+            <WlColumn title="Losing trades" data={wl.losers} tone="rose" />
+          </div>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+function ReportCard({ title, value, sub, subClass = '' }) {
+  return (
+    <Card className="!p-4">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">{title}</p>
+      <p className="mt-1 truncate text-lg font-bold text-slate-900 dark:text-white">{value}</p>
+      <p className={`text-xs ${subClass || 'text-slate-500 dark:text-slate-400'}`}>{sub}</p>
+    </Card>
+  )
+}
+
+function WlColumn({ title, data, tone }) {
+  const toneText = tone === 'emerald' ? 'text-emerald-500' : 'text-rose-500'
+  if (!data)
+    return (
+      <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center text-sm text-slate-400 dark:border-neutral-700">
+        No {title.toLowerCase()} yet.
+      </div>
+    )
+  const rowCls = 'flex items-center justify-between py-1.5 text-sm'
+  return (
+    <div className={`rounded-xl border p-4 ${tone === 'emerald' ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-rose-500/30 bg-rose-500/5'}`}>
+      <p className={`mb-2 font-semibold ${toneText}`}>{title} ({data.count})</p>
+      <div className="divide-y divide-slate-100 dark:divide-neutral-800">
+        <div className={rowCls}><span className="text-slate-500 dark:text-slate-400">Total P&L</span><span className={`font-bold tabular-nums ${toneText}`}>{signedMoney(data.totalPnl)}</span></div>
+        <div className={rowCls}><span className="text-slate-500 dark:text-slate-400">Avg P&L / trade</span><span className="tabular-nums">{signedMoney(data.avgPnl)}</span></div>
+        <div className={rowCls}><span className="text-slate-500 dark:text-slate-400">Avg contracts</span><span className="tabular-nums">{num(data.avgContracts)}</span></div>
+        {data.avgHour != null && (
+          <div className={rowCls}><span className="text-slate-500 dark:text-slate-400">Avg entry time</span><span className="tabular-nums">{data.avgHour}:00</span></div>
+        )}
+        {data.avgR != null && (
+          <div className={rowCls}><span className="text-slate-500 dark:text-slate-400">Avg R-multiple</span><span className="tabular-nums">{num(data.avgR)}R</span></div>
+        )}
+        {data.avgQuality != null && (
+          <div className={rowCls}><span className="text-slate-500 dark:text-slate-400">Avg quality</span><span className="tabular-nums">{num(data.avgQuality, 1)}★</span></div>
+        )}
+        <div className={rowCls}><span className="text-slate-500 dark:text-slate-400">Rules followed</span><span className="tabular-nums">{pct(data.rulesFollowedPct)}</span></div>
+        {data.topTags.length > 0 && (
+          <div className="pt-2 text-xs text-slate-500 dark:text-slate-400">Top tags: {data.topTags.join(' · ')}</div>
+        )}
+      </div>
+    </div>
   )
 }

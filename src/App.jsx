@@ -12,6 +12,8 @@ import Analytics from './pages/Analytics'
 import Accounts from './pages/Accounts'
 import Checklist from './pages/Checklist'
 import Settings from './pages/Settings'
+import Playbook from './pages/Playbook'
+import Notebook from './pages/Notebook'
 
 export default function App() {
   return (
@@ -26,6 +28,8 @@ export default function App() {
                   <Route path="trades" element={<TradeLog />} />
                   <Route path="calendar" element={<Calendar />} />
                   <Route path="journal" element={<Journal />} />
+                  <Route path="notebook" element={<Notebook />} />
+                  <Route path="playbook" element={<Playbook />} />
                   <Route path="analytics" element={<Analytics />} />
                   <Route path="accounts" element={<Accounts />} />
                   <Route path="checklist" element={<Checklist />} />
